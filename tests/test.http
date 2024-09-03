@@ -1,0 +1,15 @@
+### Send POST request with json body
+POST http://dev.qingwariji.com/api/gm/info/login
+Content-Type: application/json
+
+{
+  "account": "gm",
+  "password": "content"
+}
+
+### Send POST request with json body
+GET http://dev.qingwariji.com/api/gm/info/info
+Content-Type: application/json
+Gtoken: 98d4b55b-db27-402f-b9b9-8c8807fff91c
+
+

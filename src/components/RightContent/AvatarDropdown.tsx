@@ -8,6 +8,7 @@ import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
+import {TokenUtils} from "@/utils/TokenUtils";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;
@@ -66,10 +67,13 @@ export const AvatarDropdown: React.FC<GlobalHeaderRightProps> = ({ menu, childre
     (event: MenuInfo) => {
       const { key } = event;
       if (key === 'logout') {
+        console.log('退出登录')
         flushSync(() => {
           setInitialState((s) => ({ ...s, currentUser: undefined }));
         });
-        loginOut();
+        TokenUtils.clearToken();
+        history.push(`/user/login`);
+        // loginOut();
         return;
       }
       history.push(`/account/${key}`);

@@ -19,8 +19,12 @@ import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
 import { Footer } from '../../../components';
-import { login } from '../../../services/ant-design-pro/api';
+import {currentUser as queryCurrentUser, login} from '../../../services/ant-design-pro/api';
 import { getFakeCaptcha } from '../../../services/ant-design-pro/login';
+import {CryptoUtils} from "@/utils/CryptoUtils";
+import {TokenUtils} from "@/utils/TokenUtils";
+import defaultSettings from "../../../../config/defaultSettings";
+import type {Settings as LayoutSettings} from "@ant-design/pro-layout";
 
 const useStyles = createStyles(({ token }) => {
   return {
@@ -58,17 +62,6 @@ const useStyles = createStyles(({ token }) => {
   };
 });
 
-const ActionIcons = () => {
-  const { styles } = useStyles();
-
-  return (
-    <>
-      <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.action} />
-      <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.action} />
-      <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.action} />
-    </>
-  );
-};
 
 const Lang = () => {
   const { styles } = useStyles();
@@ -103,12 +96,15 @@ const Login: React.FC = () => {
   const intl = useIntl();
 
   const fetchUserInfo = async () => {
-    const userInfo = await initialState?.fetchUserInfo?.();
-    if (userInfo) {
+    const apiResult = await queryCurrentUser({
+      skipErrorHandler: true,
+    });
+
+    if (apiResult.success) {
       flushSync(() => {
         setInitialState((s) => ({
           ...s,
-          currentUser: userInfo,
+          currentUser: apiResult.data,
         }));
       });
     }
@@ -117,21 +113,19 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
-      const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
+      const msg = await login({account: values.username, password: CryptoUtils.md5Encode(values.password!)});
+      if (msg.success) {
+
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
+        TokenUtils.setToken(msg.data.gToken);
         await fetchUserInfo();
-        const urlParams = new URL(window.location.href).searchParams;
-        history.push(urlParams.get('redirect') || '/');
+        history.push('/invite');
         return;
       }
-      console.log(msg);
-      // 如果失败去设置用户错误信息
-      setUserLoginState(msg);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -166,20 +160,12 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="/logo.svg" />}
-          title="Ant Design"
-          subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+          // logo={<img alt="logo" src="/logo.svg" />}
+          title="青蛙日记管理系统"
+          subTitle={'\n'}
           initialValues={{
             autoLogin: true,
           }}
-          actions={[
-            <FormattedMessage
-              key="loginWith"
-              id="pages.login.loginWith"
-              defaultMessage="其他登录方式"
-            />,
-            <ActionIcons key="icons" />,
-          ]}
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);
           }}
@@ -194,13 +180,6 @@ const Login: React.FC = () => {
                 label: intl.formatMessage({
                   id: 'pages.login.accountLogin.tab',
                   defaultMessage: '账户密码登录',
-                }),
-              },
-              {
-                key: 'mobile',
-                label: intl.formatMessage({
-                  id: 'pages.login.phoneLogin.tab',
-                  defaultMessage: '手机号登录',
                 }),
               },
             ]}
@@ -358,7 +337,6 @@ const Login: React.FC = () => {
                 float: 'right',
               }}
             >
-              <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
             </a>
           </div>
         </LoginForm>
