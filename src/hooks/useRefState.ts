@@ -1,8 +1,6 @@
-import React, {Dispatch, SetStateAction, useRef, useState} from 'react';
+import { Dispatch, SetStateAction, useRef, useState } from 'react';
 
-export default function useRefState<T>(
-  initData: T,
-): [T, Dispatch<SetStateAction<T>>, () => T] {
+export default function useRefState<T>(initData: T): [T, Dispatch<SetStateAction<T>>, () => T] {
   const [state, setState] = useState<T>(initData);
   const stateRef = useRef<T>(initData);
 

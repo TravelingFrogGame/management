@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 // list
 
 const Banner: React.FC = () => {
-
-  return (
-    <div>
-      Banner
-    </div>
-  );
+  return <div>Banner</div>;
 };
 
 export default Banner;

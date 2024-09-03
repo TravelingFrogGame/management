@@ -2,19 +2,22 @@ import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
 import { LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
+import { RenderSetting } from '@ant-design/pro-layout/es/defaultSettings';
+import { PureSettings } from '@ant-design/pro-layout/lib/defaultSettings';
 import { history, Link } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { AvatarDropdown, AvatarName, Footer, Question, SelectLang } from './components';
 import { errorConfig } from './requestErrorConfig';
-import {RenderSetting} from "@ant-design/pro-layout/es/defaultSettings";
-import {PureSettings} from "@ant-design/pro-layout/lib/defaultSettings";
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
  * */
-export async function getInitialState(): Promise<{ settings: Partial<PureSettings & RenderSetting>; currentUser: any }> {
+export async function getInitialState(): Promise<{
+  settings: Partial<PureSettings & RenderSetting>;
+  currentUser: any;
+}> {
   const apiResult = await queryCurrentUser({
     skipErrorHandler: true,
   });
@@ -25,8 +28,13 @@ export async function getInitialState(): Promise<{ settings: Partial<PureSetting
   };
 }
 
-export const layout: ({initialState, setInitialState}: { initialState: any; setInitialState: any }) => any = ({ initialState, setInitialState }) => {
-
+export const layout: ({
+  initialState,
+  setInitialState,
+}: {
+  initialState: any;
+  setInitialState: any;
+}) => any = ({ initialState, setInitialState }) => {
   return {
     actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
     avatarProps: {
@@ -47,9 +55,7 @@ export const layout: ({initialState, setInitialState}: { initialState: any; setI
         history.push(loginPath);
       }
     },
-    bgLayoutImgList: [
-
-    ],
+    bgLayoutImgList: [],
     links: isDev
       ? [
           <Link key="openapi" to="/umi/plugin/openapi" target="_blank">

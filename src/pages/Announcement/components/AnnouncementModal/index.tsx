@@ -1,7 +1,5 @@
-
-import React, {useState} from 'react';
-import {Button, Drawer, Space} from "antd";
-
+import { Button, Drawer, Space } from 'antd';
+import { useState } from 'react';
 
 interface ModalNodeProps {
   closeModal(): () => void;
@@ -18,16 +16,13 @@ export function useAnnouncementModal(callback?: () => void) {
     setOpen(true);
   }
   return {
-    node: (
-      <ModalNode open={open} closeModal={closeModal}/>
-    ),
+    node: <ModalNode open={open} closeModal={closeModal} />,
     openModal,
   };
 }
 
 function ModalNode(props: ModalNodeProps) {
-  const {closeModal, open} = props;
-
+  const { closeModal, open } = props;
 
   return (
     <Drawer

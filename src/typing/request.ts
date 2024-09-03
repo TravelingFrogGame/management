@@ -37,7 +37,6 @@ export interface ResultType<T> {
   error: boolean;
 }
 
-
 export interface Paging<T> {
   last?: boolean;
   list?: T[];

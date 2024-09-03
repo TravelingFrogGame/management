@@ -1,6 +1,6 @@
-import {useEffect, useRef, useState} from 'react';
-import {flushSync} from 'react-dom';
-import useRefState from "@/hooks/useRefState";
+import useRefState from '@/hooks/useRefState';
+import { useEffect, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 interface FuncDataProxyProps {
   queryParameters?: any;
@@ -9,10 +9,7 @@ interface FuncDataProxyProps {
 
 const pageSize = 20;
 
-export default function useFuncListDataProxy<T = any>(
-  api: any,
-  props?: FuncDataProxyProps,
-) {
+export default function useFuncListDataProxy<T = any>(api: any, props?: FuncDataProxyProps) {
   const queryParametersRef = useRef(props?.queryParameters);
   const pageIndexRef = useRef(-1);
 
@@ -49,7 +46,7 @@ export default function useFuncListDataProxy<T = any>(
 
       const apiResult = await api(parameters);
 
-      const {error, data: apiResultData} = apiResult;
+      const { error, data: apiResultData } = apiResult;
 
       if (error) {
         return;

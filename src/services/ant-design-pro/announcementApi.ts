@@ -1,5 +1,5 @@
+import { Paging, ResultType } from '@/typing/request';
 import { request } from '@umijs/max';
-import {Paging, ResultType} from "@/typing/request";
 
 export interface AnnouncementType {
   content: string;
@@ -11,14 +11,20 @@ export interface AnnouncementType {
   url: string;
 }
 
-export async function list(body: { password: any; account: string | undefined }, options?: { [p: string]: any }): Promise<ResultType<Paging<AnnouncementType>>> {
+export async function list(
+  body: { password: any; account: string | undefined },
+  options?: { [p: string]: any },
+): Promise<ResultType<Paging<AnnouncementType>>> {
   return request('/gm/notice/list', {
     method: 'GET',
     data: body,
     ...(options || {}),
   });
 }
-export async function close(body: { id: number}, options?: { [p: string]: any }): Promise<ResultType<Paging<AnnouncementType>>> {
+export async function close(
+  body: { id: number },
+  options?: { [p: string]: any },
+): Promise<ResultType<Paging<AnnouncementType>>> {
   return request('/gm/notice/close', {
     method: 'POST',
     data: body,
