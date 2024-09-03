@@ -23,12 +23,12 @@ export default [
     ],
   },
   {
-    name: '邀请',
+    name: '用户邀请',
     path: '/invite',
     component: './Invite',
   },
   {
-    name: '公告',
+    name: '公告上架',
     path: '/announcement',
     component: './Announcement',
   },
@@ -38,9 +38,14 @@ export default [
     component: './Banner',
   },
   {
-    name: 'assets上架',
+    name: '资产上架',
     path: '/assets',
     component: './Assets',
+  },
+  {
+    name: '资产管理',
+    path: '/assetManagement',
+    component: './AssetManagement',
   },
   {
     name: '版本热更',

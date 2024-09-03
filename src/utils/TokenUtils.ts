@@ -1,7 +1,6 @@
 import {DataUtils} from "@/utils/DataUtils";
 
 const tokenKey = 'tokenId';
-
 export namespace TokenUtils {
   export async function setToken(token: string) {
     await localStorage.setItem(tokenKey, token);
