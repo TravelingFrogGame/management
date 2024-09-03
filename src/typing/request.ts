@@ -36,3 +36,12 @@ export interface ResultType<T> {
   success: boolean;
   error: boolean;
 }
+
+
+export interface Paging<T> {
+  last?: boolean;
+  list?: T[];
+  page?: number;
+  total?: number;
+  totalPage?: number;
+}

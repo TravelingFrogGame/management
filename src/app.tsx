@@ -37,7 +37,7 @@ export const layout: ({initialState, setInitialState}: { initialState: any; setI
       },
     },
     waterMarkProps: {
-      content: initialState?.currentUser?.name,
+      // content: initialState?.currentUser?.name,
     },
     footerRender: () => <Footer />,
     onPageChange: () => {

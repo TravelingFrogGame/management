@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+// list
+
 const Banner: React.FC = () => {
 
   return (
