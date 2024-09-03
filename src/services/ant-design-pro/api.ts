@@ -48,7 +48,7 @@ export async function getNotices(options?: { [key: string]: any }) {
 }
 
 /** 获取规则列表 GET /api/rule */
-export async function rule(
+export async function versionList(
   params: {
     // query
     /** 当前的页码 */
@@ -58,7 +58,7 @@ export async function rule(
   },
   options?: { [key: string]: any },
 ) {
-  return request<API.RuleList>('/api/rule', {
+  return request<API.VersionList>('gm/version/list', {
     method: 'GET',
     params: {
       ...params,
@@ -69,7 +69,7 @@ export async function rule(
 
 /** 更新规则 PUT /api/rule */
 export async function updateRule(options?: { [key: string]: any }) {
-  return request<API.RuleListItem>('/api/rule', {
+  return request<API.VersionListItem>('/api/rule', {
     method: 'POST',
     data: {
       method: 'update',
@@ -80,7 +80,7 @@ export async function updateRule(options?: { [key: string]: any }) {
 
 /** 新建规则 POST /api/rule */
 export async function addRule(options?: { [key: string]: any }) {
-  return request<API.RuleListItem>('/api/rule', {
+  return request<API.VersionListItem>('/api/rule', {
     method: 'POST',
     data: {
       method: 'post',

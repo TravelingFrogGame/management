@@ -34,24 +34,16 @@ declare namespace API {
     pageSize?: number;
   };
 
-  type RuleListItem = {
-    publishTime: any;
-    key?: number;
-    disabled?: boolean;
-    href?: string;
-    avatar?: string;
-    name?: string;
-    owner?: string;
-    desc?: string;
-    callNo?: number;
-    status?: number;
-    updatedAt?: string;
-    createdAt?: string;
-    progress?: number;
+  type VersionListItem = {
+    url?: string;
+    version?: number;
+    updateContent?: string;
+    platform?: string;
+    id?: number;
   };
 
-  type RuleList = {
-    data?: RuleListItem[];
+  type VersionList = {
+    list?: VersionListItem[];
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;
