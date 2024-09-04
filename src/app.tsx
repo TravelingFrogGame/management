@@ -36,7 +36,6 @@ export const layout: ({
   setInitialState: any;
 }) => any = ({ initialState, setInitialState }) => {
   return {
-    actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
@@ -56,13 +55,6 @@ export const layout: ({
       }
     },
     bgLayoutImgList: [],
-    links: isDev
-      ? [
-          <Link key="openapi" to="/umi/plugin/openapi" target="_blank">
-            <LinkOutlined />
-          </Link>,
-        ]
-      : [],
     menuHeaderRender: undefined,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
