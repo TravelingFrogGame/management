@@ -5,7 +5,6 @@ import { AnnouncementType } from '@/services/ant-design-pro/announcementApi';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message, Popconfirm } from 'antd';
 import React, { useRef } from 'react';
-import {FormattedMessage} from "@@/exports";
 import {PlusOutlined} from "@ant-design/icons";
 
 const Announcement: React.FC = () => {

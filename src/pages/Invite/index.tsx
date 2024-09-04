@@ -1,98 +1,55 @@
 import useFuncListDataProxy from '@/hooks/useFuncListDataProxy';
 import { useAnnouncementModal } from '@/pages/Announcement/components/AnnouncementModal';
-import * as announcementApi from '@/services/ant-design-pro/announcementApi';
-import { AnnouncementType } from '@/services/ant-design-pro/announcementApi';
+import * as inviteApi from '@/services/ant-design-pro/inviteApi';
+import { InviteType } from '@/services/ant-design-pro/inviteApi';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Popconfirm } from 'antd';
 import React, { useRef } from 'react';
+import {Button, Col, Row, Space, Statistic, StatisticProps} from "antd";
+import CountUp from 'react-countup';
+
+const formatter: StatisticProps['formatter'] = (value) => (
+  <CountUp end={value as number} separator="," />
+);
 
 const Invite: React.FC = () => {
-  const bannerData = useFuncListDataProxy<AnnouncementType>(announcementApi.list, {
+  const bannerData = useFuncListDataProxy<InviteType>(inviteApi.list, {
     execution: true,
-  });
-
-  async function confirmDelete(item: AnnouncementType) {
-    const apiResult = await announcementApi.close({ id: item.id });
-    if (apiResult.success) {
-      message.success('删除成功');
-      bannerData.refresh();
-      return;
+    queryParameters: {
+      userNo: 'mtw2d1qb'
     }
-    message.error('删除失败');
-  }
+  });
 
   const actionRef = useRef<ActionType>();
 
-  const columns: ProColumns<AnnouncementType>[] = [
+  const columns: ProColumns<InviteType>[] = [
     {
-      title: '标题',
-      dataIndex: 'title',
-      render: (dom, entity) => {
-        return <a onClick={() => {}}>{dom}</a>;
-      },
+      title: '新用户名称',
+      dataIndex: 'userName',
     },
     {
-      title: '内容',
-      dataIndex: 'content',
+      title: '新用户ID',
+      dataIndex: 'userNo',
     },
     {
-      title: '状态',
-      dataIndex: 'status',
-      // 1=发布, 2=预发布,3=下架
-      valueEnum: {
-        1: {
-          text: '发布成功',
-          status: 'Success',
-        },
-        2: {
-          text: '预发布',
-          status: 'Processing',
-        },
-        3: {
-          text: '下架',
-          status: 'Error',
-        },
-      },
+      title: '总消费（CNY）',
+      dataIndex: 'consumeTotal',
     },
     {
-      title: '发布时间',
-      dataIndex: 'publishTime',
-      sorter: (a, b) => a.publishTime - b.publishTime,
+      title: '注册时间',
+      dataIndex: 'userRegisterTime',
     },
     {
-      title: '创建时间',
-      dataIndex: 'createTime',
+      title: '邀请人',
+      dataIndex: 'inviterName',
     },
     {
-      title: '创建人',
-      dataIndex: 'create',
+      title: '邀请人ID',
+      dataIndex: 'inviterNo',
     },
     {
-      title: '备注',
-      dataIndex: 'remark',
-    },
-    {
-      title: '操作',
-      dataIndex: 'op',
-      render(d_, item) {
-        return (
-          <>
-            <Popconfirm
-              placement="topLeft"
-              title={'确认删除吗'}
-              onConfirm={() => {
-                confirmDelete(item);
-              }}
-            >
-              <Button type={'link'} size={'small'} danger>
-                删除
-              </Button>
-            </Popconfirm>
-            <Button size={'small'} type={'link'}>编辑</Button>
-          </>
-        );
-      },
-    },
+      title: '层级',
+      dataIndex: 'level',
+    }
   ];
 
   function refresh() {
@@ -101,24 +58,39 @@ const Invite: React.FC = () => {
 
   const InviteModal = useAnnouncementModal();
 
+  function exportCVS() {
+
+  }
+
   return (
-    <PageContainer>
-      <ProTable<AnnouncementType, API.PageParams>
+    <PageContainer
+      content={
+        <Row gutter={16}>
+          <Col span={6}>
+            <Statistic title="邀请好友" value={112893} formatter={formatter} />
+          </Col>
+          <Col span={6}>
+            <Statistic title="好友累计消费" value={112893} precision={2} formatter={formatter} />
+          </Col>
+        </Row>
+      }
+    >
+      <ProTable<InviteType, API.PageParams>
         search={false}
         options={{
+          density: false,
           setting: false,
           reloadIcon: <div onClick={refresh}>刷新</div>,
         }}
-        actionRef={actionRef}
-        rowKey="key"
         toolBarRender={() => [
-          <Button type="primary" key="primary" onClick={InviteModal.openModal}>
-            新增
+          <Button type="primary" key="primary" onClick={exportCVS}>
+            导出
           </Button>,
         ]}
+        actionRef={actionRef}
+        rowKey="key"
         columns={columns}
-        dataSource={bannerData.data}
-      />
+        dataSource={bannerData.data} />
       {InviteModal.node}
     </PageContainer>
   );
