@@ -5,6 +5,8 @@ import { AnnouncementType } from '@/services/ant-design-pro/announcementApi';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message, Popconfirm } from 'antd';
 import React, { useRef } from 'react';
+import {FormattedMessage} from "@@/exports";
+import {PlusOutlined} from "@ant-design/icons";
 
 const Announcement: React.FC = () => {
   const bannerData = useFuncListDataProxy<AnnouncementType>(announcementApi.list, {
@@ -38,6 +40,21 @@ const Announcement: React.FC = () => {
     {
       title: '状态',
       dataIndex: 'status',
+      // 1=发布, 2=预发布,3=下架
+      valueEnum: {
+        1: {
+          text: '发布成功',
+          status: 'Success',
+        },
+        2: {
+          text: '预发布',
+          status: 'Processing',
+        },
+        3: {
+          text: '下架',
+          status: 'Error',
+        },
+      },
     },
     {
       title: '发布时间',
@@ -69,11 +86,11 @@ const Announcement: React.FC = () => {
                 confirmDelete(item);
               }}
             >
-              <Button type={'link'} danger>
+              <Button type={'link'} size={'small'} danger>
                 删除
               </Button>
             </Popconfirm>
-            <Button type={'link'}>编辑</Button>
+            <Button size={'small'} type={'link'}>编辑</Button>
           </>
         );
       },
@@ -92,12 +109,14 @@ const Announcement: React.FC = () => {
         search={false}
         options={{
           setting: false,
+          density: false,
           reloadIcon: <div onClick={refresh}>刷新</div>,
         }}
         actionRef={actionRef}
         rowKey="key"
         toolBarRender={() => [
           <Button type="primary" key="primary" onClick={AnnouncementModal.openModal}>
+            <PlusOutlined />
             新增公告
           </Button>,
         ]}
