@@ -13,7 +13,7 @@ Content-Type: application/json
 Gtoken: 98d4b55b-db27-402f-b9b9-8c8807fff91c
 
 ### 创建账号
-POST http://dev.qingwariji.com/api/gm/info/create
+GET http://dev.qingwariji.com/api/gm/info/create
 Content-Type: application/json
 Gtoken: bbec4723-5afa-4fc8-83e6-f8f7dd20003a
 
@@ -23,5 +23,8 @@ Gtoken: bbec4723-5afa-4fc8-83e6-f8f7dd20003a
   "name": "admin昵称"
 }
 
-
+### 创建账号
+GET http://dev.qingwariji.com/api/gm/notice/list?page=0&pageSize=1
+Content-Type: application/json
+Gtoken: 9f9158a8-8753-45de-aa40-c3594856d3a4
 

@@ -17,7 +17,7 @@ export async function list(
 ): Promise<ResultType<Paging<AnnouncementType>>> {
   return request('/gm/notice/list', {
     method: 'GET',
-    data: body,
+    params: body,
     ...(options || {}),
   });
 }

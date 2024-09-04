@@ -1,6 +1,7 @@
 import useRefState from '@/hooks/useRefState';
-import { useEffect, useRef, useState } from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import { flushSync } from 'react-dom';
+import {TablePaginationConfig} from "antd";
 
 interface FuncDataProxyProps {
   queryParameters?: any;
@@ -11,13 +12,18 @@ const pageSize = 20;
 
 export default function useFuncListDataProxy<T = any>(api: any, props?: FuncDataProxyProps) {
   const queryParametersRef = useRef(props?.queryParameters);
-  const pageIndexRef = useRef(-1);
+  const pageIndexRef = useRef(0);
 
   const [init, setInit] = useRefState(false);
 
   const [pullIng, setPullIng, getPullIng] = useRefState(false);
 
   const [moreData, setMoreData] = useState<boolean>(true);
+
+  const [pagination, setPagination] = useState({
+    total: 0,
+    pageSize: pageSize,
+  });
 
   // @ts-ignore
   const [dataList, setDataList] = useState<T[]>([]);
@@ -26,24 +32,24 @@ export default function useFuncListDataProxy<T = any>(api: any, props?: FuncData
     queryParametersRef.current = queryParameters;
   }
 
-  async function nextPage(refresh?: boolean) {
+  async function change(index: number) {
     if (getPullIng()) {
       return;
     }
 
     try {
+
       setPullIng(true);
+      pageIndexRef.current = index;
 
-      const currentIndex = refresh ? -1 : pageIndexRef.current;
+      const currentIndex = pageIndexRef.current;
 
-      const nextPageIndex = currentIndex + 1;
       const queryParameters = queryParametersRef.current || {};
       const parameters = {
         ...queryParameters,
         pageSize,
-        page: nextPageIndex,
+        page: currentIndex,
       };
-
       const apiResult = await api(parameters);
 
       const { error, data: apiResultData } = apiResult;
@@ -55,15 +61,14 @@ export default function useFuncListDataProxy<T = any>(api: any, props?: FuncData
       const list = apiResultData.list;
       const last = apiResultData.last;
 
+
       flushSync(() => {
-        // @ts-ignore
-        if (refresh) {
-          setDataList(list);
-        } else {
-          setDataList([...dataList, ...list]);
-        }
+        setDataList(list);
+        setPagination({
+          total: apiResultData.total,
+          pageSize
+        });
       });
-      pageIndexRef.current = nextPageIndex;
       if (last) {
         setMoreData(false);
       }
@@ -76,23 +81,30 @@ export default function useFuncListDataProxy<T = any>(api: any, props?: FuncData
   }
 
   async function refresh() {
-    pageIndexRef.current = -1;
-    queryParametersRef.current = props?.queryParameters;
-    setMoreData(true);
-    await nextPage(true);
+    await change(pageIndexRef.current);
   }
 
   useEffect(() => {
     if (props?.execution) {
-      nextPage().then();
+      change(0);
     }
   }, []);
+
+  const exportPagination = useMemo(() => {
+    return {
+      ...pagination,
+      onChange: (index: number) => {
+        change(index - 1);
+      }
+    }
+  }, [pagination, change]);
 
   return {
     moreData,
     data: dataList,
-    nextPage,
+    change,
     changeQueryParameters,
+    pagination: exportPagination as TablePaginationConfig,
     pullIng,
     init,
     refresh,
