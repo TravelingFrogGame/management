@@ -79,8 +79,8 @@ export async function updateRule(options?: { [key: string]: any }) {
 }
 
 /** 新建规则 POST /api/rule */
-export async function addRule(options?: { [key: string]: any }) {
-  return request<API.VersionListItem>('/api/rule', {
+export async function addVersion(options?: { [key: string]: any }) {
+  return request<API.VersionListItem>('gm/version/add', {
     method: 'POST',
     data: {
       method: 'post',

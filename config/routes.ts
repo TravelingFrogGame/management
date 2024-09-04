@@ -53,11 +53,6 @@ export default [
     component: './Version',
   },
   {
-    name: 'tab list',
-    path: '/TableList',
-    component: './TableList',
-  },
-  {
     path: '*',
     layout: false,
     component: './404',

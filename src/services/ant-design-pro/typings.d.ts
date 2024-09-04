@@ -40,6 +40,11 @@ declare namespace API {
     updateContent?: string;
     platform?: string;
     id?: number;
+    createTime?: string;
+    publishTime?: string;
+    creator?: string;
+    status?: number; // 1发布成功 2预发布  3已下架
+    remark?: string; //备注
   };
 
   type VersionList = {

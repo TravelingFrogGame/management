@@ -1,118 +1,111 @@
 import { PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
-  FooterToolbar,
+  ActionType,
+  ProColumns,
+  ProFormDateTimePicker,
+  ProFormSelect,
+} from '@ant-design/pro-components';
+import {
   ModalForm,
   PageContainer,
-  ProDescriptions,
   ProFormText,
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
-import React, { useRef, useState } from 'react';
-import { addRule, removeRule, versionList, updateRule } from '../../services/ant-design-pro/api';
+import { FormattedMessage } from '@umijs/max';
+import {Button, message} from 'antd';
+import React, {useRef, useState} from 'react';
 import type { FormValueType } from '../TableList/components/UpdateForm';
-import UpdateForm from '../TableList/components/UpdateForm';
 import useFuncListDataProxy from "@/hooks/useFuncListDataProxy";
 import * as versionApi from '@/services/ant-design-pro/versionApi';
-import axios from "axios";
-import {val} from "@umijs/utils/compiled/cheerio/lib/api/attributes";
-
-/**
- * @en-US Add node
- * @zh-CN 添加节点
- * @param fields
- */
-const handleAdd = async (fields: API.VersionListItem) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addRule({ ...fields });
-    hide();
-    message.success('Added successfully');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Adding failed, please try again!');
-    return false;
-  }
-};
-
-/**
- * @en-US Update node
- * @zh-CN 更新节点
- *
- * @param fields
- */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('Configuring');
-  try {
-    await updateRule({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
-
-    message.success('Configuration is successful');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Configuration failed, please try again!');
-    return false;
-  }
-};
-
-/**
- *  Delete node
- * @zh-CN 删除节点
- *
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: API.VersionListItem[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
-  try {
-    await removeRule({
-      key: selectedRows.map((row) => row.id),
-    });
-    hide();
-    message.success('Deleted successfully and will refresh soon');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('Delete failed, please try again');
-    return false;
-  }
-};
+import {VersionStatus} from "@/services/ant-design-pro/enum";
+import dayjs from "dayjs";
 
 const VersionList: React.FC = () => {
-
   const versionData = useFuncListDataProxy(versionApi.versionList, {execution: true});
+
+  /**
+   * @en-US Add node
+   * @zh-CN 添加节点
+   * @param fields
+   */
+  const handleAdd = async (fields: API.VersionListItem) => {
+    const hide = message.loading('正在添加');
+    try {
+      const {success,msg} = await versionApi.addVersion({...fields})
+      hide();
+      if (success) {
+        message.success('版本添加成功');
+        versionData.refresh();
+      }else {
+        message.error(`版本添加失败，请重试: ${msg}`);
+      }
+      return success;
+    } catch (error) {
+      hide();
+      message.error('版本添加失败，请重试');
+      return false;
+    }
+  };
+
+  /**
+   * @en-US Update node
+   * @zh-CN 更新节点
+   *
+   * @param fields
+   */
+  const handleUpdate = async (fields: FormValueType) => {
+    const hide = message.loading('Configuring');
+    try {
+      const {success,msg} = await versionApi.update({...fields})
+      hide();
+      if (success) {
+        message.success('更新成功');
+        versionData.refresh();
+      }else {
+        message.error(`更新失败，请重试: ${msg}`);
+      }
+      return success;
+    } catch (error) {
+      hide();
+      message.error('更新失败');
+      return false;
+    }
+  };
+
+  /**
+   *  Delete node
+   * @zh-CN 删除节点
+   *
+   * @param clickRow
+   */
+  const handleRemove = async (clickRow: API.VersionListItem) => {
+    const hide = message.loading('正在删除');
+    if (!clickRow) return true;
+    console.log(`删除节点 : ${JSON.stringify(clickRow)}`)
+    try {
+      const {success, msg} = await versionApi.unRelease({id: Number(clickRow.id)})
+      hide();
+      if (success) {
+        message.success('下架成功');
+        versionData.refresh();
+      }else {
+        message.error(`下架失败，请重试: ${msg}`);
+      }
+    } catch (error) {
+      hide();
+      message.error('下架失败');
+    }
+  };
 
   /**
    * @en-US Pop-up window of new window
    * @zh-CN 新建窗口的弹窗
    *  */
   const [createModalOpen, handleModalOpen] = useState<boolean>(false);
-  /**
-   * @en-US The pop-up window of the distribution update window
-   * @zh-CN 分布更新窗口的弹窗
-   * */
-  const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-
-  const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.VersionListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.VersionListItem[]>([]);
-
-  /**
-   * @en-US International configuration
-   * @zh-CN 国际化配置
-   * */
-  const intl = useIntl();
 
   const _version = () => {
     return {
@@ -142,9 +135,9 @@ const VersionList: React.FC = () => {
       title: '热更包',
       dataIndex: 'url',
       // hideInForm: true,
-      renderText: (val: string) =>
+      renderText: () =>
         '下载',
-      render: (dom, entity, index, action, schema) => {
+      render: (dom, entity) => {
         return <a href={entity.url}>{dom}</a>
       }
     }as ProColumns<API.VersionListItem>
@@ -157,33 +150,19 @@ const VersionList: React.FC = () => {
       hideInForm: true,
       valueEnum: {
         0: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.default"
-              defaultMessage="Shut down"
-            />
-          ),
+          text: '默认',
           status: 'Default',
         },
-        1: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.running" defaultMessage="Running" />
-          ),
+        2: {
+          text: '预发布',
           status: 'Processing',
         },
-        2: {
-          text: (
-            <FormattedMessage id="pages.searchTable.nameStatus.online" defaultMessage="Online" />
-          ),
+        1: {
+          text: '发布成功',
           status: 'Success',
         },
         3: {
-          text: (
-            <FormattedMessage
-              id="pages.searchTable.nameStatus.abnormal"
-              defaultMessage="Abnormal"
-            />
-          ),
+          text: '已下架',
           status: 'Error',
         },
       },
@@ -193,61 +172,25 @@ const VersionList: React.FC = () => {
   const _releaseTime = () => {
     return {
       title: '发布时间',
+      dataIndex: 'publishTime',
+      valueType: 'textarea',
       sorter: true,
-      dataIndex: 'updatedAt',
-      valueType: 'dateTime',
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return (
-            <Input
-              {...rest}
-              placeholder={intl.formatMessage({
-                id: 'pages.searchTable.exception',
-                defaultMessage: 'Please enter the reason for the exception!',
-              })}
-            />
-          );
-        }
-        return defaultRender(item);
-      },
-    }
+    } as ProColumns<API.VersionListItem>
   }
 
   const _createTime = () => {
     return {
       title: '创建时间',
+      dataIndex: 'createTime',
+      valueType: 'textarea',
       sorter: true,
-      dataIndex: 'updatedAt',
-      valueType: 'dateTime',
-      renderFormItem: (item, { defaultRender, ...rest }, form) => {
-        const status = form.getFieldValue('status');
-        if (`${status}` === '0') {
-          return false;
-        }
-        if (`${status}` === '3') {
-          return (
-            <Input
-              {...rest}
-              placeholder={intl.formatMessage({
-                id: 'pages.searchTable.exception',
-                defaultMessage: 'Please enter the reason for the exception!',
-              })}
-            />
-          );
-        }
-        return defaultRender(item);
-      },
-    }
+    } as ProColumns<API.VersionListItem>
   }
 
   const _createUser = () => {
     return {
       title: '创建人',
-      dataIndex: 'desc',
+      dataIndex: 'creator',
       valueType: 'textarea',
     } as ProColumns<API.VersionListItem>
   }
@@ -255,7 +198,7 @@ const VersionList: React.FC = () => {
   const _tips = () => {
     return {
       title: '备注',
-      dataIndex: 'desc',
+      dataIndex: 'remark',
       valueType: 'textarea',
     } as ProColumns<API.VersionListItem>
   }
@@ -265,21 +208,31 @@ const VersionList: React.FC = () => {
       title:'操作',
       dataIndex: 'option',
       valueType: 'option',
-      render: (_, record) => [
-        <a
+      render: (_, record) => {
+        const EditNode = (<a
           key="config"
           onClick={() => {
-            handleUpdateModalOpen(true);
             setCurrentRow(record);
+            console.log(`当前点击的item : ${record?.publishTime}`)
+
+            handleModalOpen(true);
           }}
         >
           编辑
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          删除
-        </a>,
-      ],
-    }
+        </a>);
+        const UnReleaseNode = <a key="subscribeAlert" onClick={() => {
+          handleRemove(record);
+        }}>
+          下架
+        </a>;
+
+        let operations = [EditNode, UnReleaseNode];
+        if (record.status === VersionStatus.Removed) {
+          operations = [];
+        }
+        return operations;
+      },
+    } as ProColumns<API.VersionListItem>
   }
 
   const columns: ProColumns<API.VersionListItem>[] = [
@@ -322,52 +275,21 @@ const VersionList: React.FC = () => {
         //   },
         // }}
       />
-      {selectedRowsState?.length > 0 && (
-        <FooterToolbar
-          extra={
-            <div>
-              <FormattedMessage id="pages.searchTable.chosen" defaultMessage="Chosen" />{' '}
-              <a style={{ fontWeight: 600 }}>{selectedRowsState.length}</a>{' '}
-              <FormattedMessage id="pages.searchTable.item" defaultMessage="项" />
-              &nbsp;&nbsp;
-              <span>
-                <FormattedMessage
-                  id="pages.searchTable.totalServiceCalls"
-                  defaultMessage="Total number of service calls"
-                />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}
-                <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
-              </span>
-            </div>
-          }
-        >
-          <Button
-            onClick={async () => {
-              await handleRemove(selectedRowsState);
-              setSelectedRows([]);
-              actionRef.current?.reloadAndRest?.();
-            }}
-          >
-            <FormattedMessage
-              id="pages.searchTable.batchDeletion"
-              defaultMessage="Batch deletion"
-            />
-          </Button>
-          <Button type="primary">
-            <FormattedMessage
-              id="pages.searchTable.batchApproval"
-              defaultMessage="Batch approval"
-            />
-          </Button>
-        </FooterToolbar>
-      )}
       <ModalForm
         title={'发布版本'}
         width="400px"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.VersionListItem);
+          setCurrentRow(undefined);
+
+          let operation;
+          if (currentRow) {
+            operation = handleAdd;
+          }else {
+            operation = handleUpdate;
+          }
+          const success = await operation(value as API.VersionListItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -375,68 +297,68 @@ const VersionList: React.FC = () => {
             }
           }
         }}
+        modalProps={{destroyOnClose: true}}
       >
         <ProFormText
+          label={'版本号'}
           rules={[
             {
               required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
-                />
-              ),
+              message: '版本号不能为空',
             },
           ]}
           width="md"
-          name="name"
+          name="version"
+          placeholder={'请输入版本号'}
+          initialValue={currentRow?.version ?? ''}
         />
-        <ProFormTextArea width="md" name="desc" />
+        <ProFormText
+          label={'下载地址'}
+          rules={[
+            {
+              required: true,
+              message: '热更包地址不能为空',
+            },
+          ]}
+          width="md"
+          name="url"
+          placeholder={'请输入热更包下载地址'}
+          initialValue={currentRow?.url ?? ''}
+        />
+        <ProFormSelect
+          label={'发布平台'}
+          width="md"
+          placeholder={'请选择发布平台'}
+          rules={[{required: true, message: '发布平台不能为空'}]}
+          name={'platform'}
+          options={[{label: '苹果',value: 'ios'},{label: '安卓',value: 'android'}]}
+          initialValue={currentRow?.platform ?? ''}
+        />
+        <ProFormDateTimePicker
+          label={'发布时间'}
+          width={'md'}
+          placeholder={'请选择发布时间'}
+          name={'publishTime'}
+          rules={[{required: true, message: '发布时间不能为空'}]}
+          fieldProps={{format: 'YY/MM/DD hh:mm:ss'}}
+          // initialValue={currentRow?.publishTime ?? currentRow?.createTime}
+        />
+        <ProFormTextArea
+          label={'更新内容'}
+          placeholder={'更新内容'}
+          width="md"
+          name="updateContent"
+          rules={[{required: true,message: '更新内容不能为空'}]}
+          initialValue={currentRow?.updateContent ?? ''}
+        />
+        <ProFormTextArea
+          label={'备注'}
+          placeholder={'备注(非必填)'}
+          width="md"
+          name="remark"
+          initialValue={currentRow?.remark ?? ''}
+        />
       </ModalForm>
-      <UpdateForm
-        onSubmit={async (value) => {
-          const success = await handleUpdate(value);
-          if (success) {
-            handleUpdateModalOpen(false);
-            setCurrentRow(undefined);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-        onCancel={() => {
-          handleUpdateModalOpen(false);
-          if (!showDetail) {
-            setCurrentRow(undefined);
-          }
-        }}
-        updateModalOpen={updateModalOpen}
-        values={currentRow || {}}
-      />
-
-      <Drawer
-        width={600}
-        open={showDetail}
-        onClose={() => {
-          setCurrentRow(undefined);
-          setShowDetail(false);
-        }}
-        closable={false}
-      >
-        {currentRow?.id && (
-          <ProDescriptions<API.VersionListItem>
-            column={2}
-            title={currentRow?.id}
-            request={async () => ({
-              data: currentRow || {},
-            })}
-            params={{
-              id: currentRow?.id,
-            }}
-            columns={columns as ProDescriptionsItemProps<API.VersionListItem>[]}
-          />
-        )}
-      </Drawer>
     </PageContainer>
   );
 };
