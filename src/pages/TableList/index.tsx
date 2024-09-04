@@ -12,16 +12,16 @@ import {
 import { FormattedMessage, useIntl } from '@umijs/max';
 import { Button, Drawer, Input, message } from 'antd';
 import React, { useRef, useState } from 'react';
-import { addRule, removeRule, rule, updateRule } from '../../services/ant-design-pro/api';
-import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
+import { addRule, removeRule, versionList, updateRule } from '../../services/ant-design-pro/api';
+import type { FormValueType } from '../TableList/components/UpdateForm';
+import UpdateForm from '../TableList/components/UpdateForm';
 
 /**
  * @en-US Add node
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.RuleListItem) => {
+const handleAdd = async (fields: API.VersionListItem) => {
   const hide = message.loading('正在添加');
   try {
     await addRule({ ...fields });
@@ -66,12 +66,12 @@ const handleUpdate = async (fields: FormValueType) => {
  *
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
+const handleRemove = async (selectedRows: API.VersionListItem[]) => {
   const hide = message.loading('正在删除');
   if (!selectedRows) return true;
   try {
     await removeRule({
-      key: selectedRows.map((row) => row.key),
+      key: selectedRows.map((row) => row.id),
     });
     hide();
     message.success('Deleted successfully and will refresh soon');
@@ -98,8 +98,8 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.VersionListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<API.VersionListItem[]>([]);
 
   /**
    * @en-US International configuration
@@ -107,16 +107,10 @@ const TableList: React.FC = () => {
    * */
   const intl = useIntl();
 
-  const columns: ProColumns<API.RuleListItem>[] = [
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.updateForm.ruleName.nameLabel"
-          defaultMessage="Rule name"
-        />
-      ),
-      dataIndex: 'name',
-      tip: 'The rule name is the unique key',
+  const _version = () => {
+    return {
+      title: '版本号',
+      dataIndex: 'versionNO',
       render: (dom, entity) => {
         return (
           <a
@@ -129,30 +123,33 @@ const TableList: React.FC = () => {
           </a>
         );
       },
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="Description" />,
+    }
+  }
+
+  const _updateContent = () => {
+    return {
+      title: '更新内容',
       dataIndex: 'desc',
       valueType: 'textarea',
-    },
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleCallNo"
-          defaultMessage="Number of service calls"
-        />
-      ),
+    } as ProColumns<API.VersionListItem>
+  }
+
+  const _download = () => {
+    return {
+      title: '下载',
       dataIndex: 'callNo',
-      sorter: true,
       hideInForm: true,
       renderText: (val: string) =>
         `${val}${intl.formatMessage({
           id: 'pages.searchTable.tenThousand',
           defaultMessage: ' 万 ',
         })}`,
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
+    }
+  }
+
+  const _status = () => {
+    return {
+      title: '状态',
       dataIndex: 'status',
       hideInForm: true,
       valueEnum: {
@@ -187,14 +184,12 @@ const TableList: React.FC = () => {
           status: 'Error',
         },
       },
-    },
-    {
-      title: (
-        <FormattedMessage
-          id="pages.searchTable.titleUpdatedAt"
-          defaultMessage="Last scheduled time"
-        />
-      ),
+    }
+  }
+
+  const _releaseTime = () => {
+    return {
+      title: '发布时间',
       sorter: true,
       dataIndex: 'updatedAt',
       valueType: 'dateTime',
@@ -216,9 +211,55 @@ const TableList: React.FC = () => {
         }
         return defaultRender(item);
       },
-    },
-    {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
+    }
+  }
+
+  const _createTime = () => {
+    return {
+      title: '创建时间',
+      sorter: true,
+      dataIndex: 'updatedAt',
+      valueType: 'dateTime',
+      renderFormItem: (item, { defaultRender, ...rest }, form) => {
+        const status = form.getFieldValue('status');
+        if (`${status}` === '0') {
+          return false;
+        }
+        if (`${status}` === '3') {
+          return (
+            <Input
+              {...rest}
+              placeholder={intl.formatMessage({
+                id: 'pages.searchTable.exception',
+                defaultMessage: 'Please enter the reason for the exception!',
+              })}
+            />
+          );
+        }
+        return defaultRender(item);
+      },
+    }
+  }
+
+  const _createUser = () => {
+    return {
+      title: '创建人',
+      dataIndex: 'desc',
+      valueType: 'textarea',
+    } as ProColumns<API.VersionListItem>
+  }
+
+  const _tips = () => {
+    return {
+      title: '备注',
+      dataIndex: 'desc',
+      valueType: 'textarea',
+    } as ProColumns<API.VersionListItem>
+  }
+
+  const _operations = () => {
+    return {
+      title:'操作',
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) => [
@@ -238,22 +279,29 @@ const TableList: React.FC = () => {
           />
         </a>,
       ],
-    },
+    }
+  }
+
+  const columns: ProColumns<API.VersionListItem>[] = [
+    _version(),
+    _updateContent(),
+    _status(),
+    _download(),
+    _releaseTime(),
+    _createTime(),
+    _createUser(),
+    _tips(),
+    _operations(),
   ];
 
   return (
     <PageContainer>
-      <ProTable<API.RuleListItem, API.PageParams>
-        headerTitle={intl.formatMessage({
-          id: 'pages.searchTable.title',
-          defaultMessage: 'Enquiry form',
-        })}
+      <ProTable<API.VersionListItem, API.PageParams>
+        // headerTitle={'版本管理'}
         actionRef={actionRef}
         rowKey="key"
-        search={{
-          labelWidth: 120,
-        }}
-        toolBarRender={() => [
+        search={false}
+        optionsRender={() => [
           <Button
             type="primary"
             key="primary"
@@ -264,13 +312,13 @@ const TableList: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={rule}
+        // request={versionList}
         columns={columns}
-        rowSelection={{
-          onChange: (_, selectedRows) => {
-            setSelectedRows(selectedRows);
-          },
-        }}
+        // rowSelection={{
+        //   onChange: (_, selectedRows) => {
+        //     setSelectedRows(selectedRows);
+        //   },
+        // }}
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar
@@ -312,15 +360,12 @@ const TableList: React.FC = () => {
         </FooterToolbar>
       )}
       <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: 'New rule',
-        })}
+        title={'发布版本'}
         width="400px"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
+          const success = await handleAdd(value as API.VersionListItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -376,17 +421,17 @@ const TableList: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.name && (
-          <ProDescriptions<API.RuleListItem>
+        {currentRow?.id && (
+          <ProDescriptions<API.VersionListItem>
             column={2}
-            title={currentRow?.name}
+            title={currentRow?.id}
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
-              id: currentRow?.name,
+              id: currentRow?.id,
             }}
-            columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
+            columns={columns as ProDescriptionsItemProps<API.VersionListItem>[]}
           />
         )}
       </Drawer>
