@@ -25,7 +25,7 @@ export async function configList(
   body: { id: number },
   options?: { [p: string]: any },
 ): Promise<ResultType<Paging<AssetType>>> {
-  return request('/gm/asset/close', {
+  return request('/gm/asset/configList', {
     method: 'GET',
     params: body,
     ...(options || {}),

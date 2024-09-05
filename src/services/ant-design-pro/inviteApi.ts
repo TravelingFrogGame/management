@@ -31,3 +31,13 @@ export async function close(
     ...(options || {}),
   });
 }
+export async function csv(
+  body: any,
+  options?: { [p: string]: any },
+): Promise<ResultType<Paging<InviteType>>> {
+  return request('/gm/invite/csv', {
+    method: 'GET',
+    params: body,
+    ...(options || {}),
+  });
+}

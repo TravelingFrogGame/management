@@ -59,16 +59,13 @@ const Invite: React.FC = () => {
       title: '操作',
       search: false,
       render(_, item) {
-        return <Button type={'link'} onClick={() => {AssetModal.openModal(item)}}>查看配置</Button>
+        if (item.hasConfig) {
+          return  <Button type={'link'} onClick={() => {AssetModal.openModal(item)}}>查看配置</Button>
+        }
+        return  <Button type={'link'}>-</Button>
       }
     },
   ];
-
-
-
-  function exportCVS() {
-
-  }
 
   return (
     <PageContainer
@@ -82,11 +79,6 @@ const Invite: React.FC = () => {
           setting: false,
           reloadIcon: <div onClick={refresh}>刷新</div>,
         }}
-        toolBarRender={() => [
-          <Button type="primary" key="primary" onClick={exportCVS}>
-            导出
-          </Button>,
-        ]}
         actionRef={actionRef}
         rowKey="key"
         columns={columns}
