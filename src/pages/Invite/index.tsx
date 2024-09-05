@@ -25,30 +25,42 @@ const Invite: React.FC = () => {
     {
       title: '新用户名称',
       dataIndex: 'userName',
+      search: false,
+
     },
     {
       title: '新用户ID',
       dataIndex: 'userNo',
+      search: true,
     },
     {
       title: '总消费（CNY）',
       dataIndex: 'consumeTotal',
+      search: false,
     },
     {
       title: '注册时间',
       dataIndex: 'userRegisterTime',
+      search: false,
+
     },
     {
       title: '邀请人',
       dataIndex: 'inviterName',
+      search: false,
+
     },
     {
       title: '邀请人ID',
       dataIndex: 'inviterNo',
+      search: false,
+
     },
     {
       title: '层级',
       dataIndex: 'level',
+      search: false,
+
     }
   ];
 
@@ -76,7 +88,9 @@ const Invite: React.FC = () => {
       }
     >
       <ProTable<InviteType, API.PageParams>
-        search={false}
+        search={{
+          // filterType: 'light', // 使用轻量筛选
+        }}
         options={{
           density: false,
           setting: false,
@@ -97,3 +111,5 @@ const Invite: React.FC = () => {
 };
 
 export default Invite;
+
+
