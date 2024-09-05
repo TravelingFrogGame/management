@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import dayjs from "dayjs";
 
 export namespace DataUtils {
   export const isEmpty = obj => {
@@ -51,4 +52,9 @@ export namespace DataUtils {
   export const toPercentage = decimal => {
     return (decimal * 100).toFixed(2) + '%'; // 保留两位小数
   };
+
+  export const getCommonTime = (timeString?: string) => {
+
+    return dayjs(timeString).format('YY/MM/DD hh:mm:ss');
+  }
 }

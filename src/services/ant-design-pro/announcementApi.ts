@@ -5,10 +5,11 @@ export interface AnnouncementType {
   content: string;
   createTime: number;
   id: number;
-  publishTime: number;
+  publishTime: string;
   status: number;
   title: string;
   url: string;
+  remark: string;
 }
 
 export async function list(
@@ -26,6 +27,28 @@ export async function close(
   options?: { [p: string]: any },
 ): Promise<ResultType<Paging<AnnouncementType>>> {
   return request('/gm/notice/close', {
+    method: 'POST',
+    data: body,
+    ...(options || {}),
+  });
+}
+
+export async function add(
+  body: AnnouncementType,
+  options?: { [p: string]: any },
+): Promise<ResultType<Paging<AnnouncementType>>> {
+  return request('/gm/notice/add', {
+    method: 'POST',
+    data: body,
+    ...(options || {}),
+  });
+}
+
+export async function update(
+  body: AnnouncementType,
+  options?: { [p: string]: any },
+): Promise<ResultType<Paging<AnnouncementType>>> {
+  return request('/gm/notice/update', {
     method: 'POST',
     data: body,
     ...(options || {}),

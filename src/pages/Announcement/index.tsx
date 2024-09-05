@@ -13,6 +13,11 @@ const Announcement: React.FC = () => {
     execution: true,
   });
 
+
+  function refresh() {
+    bannerData.refresh();
+  }
+
   async function confirmDelete(item: AnnouncementType) {
     const apiResult = await announcementApi.close({ id: item.id });
     if (apiResult.success) {
@@ -24,6 +29,15 @@ const Announcement: React.FC = () => {
   }
 
   const actionRef = useRef<ActionType>();
+
+  const updateIfNeed = (success: boolean) => {
+    if (success) {
+      refresh();
+      actionRef.current?.reload();
+    }
+  }
+
+  const AnnouncementModal = useAnnouncementModal(updateIfNeed);
 
   const columns: ProColumns<AnnouncementType>[] = [
     {
@@ -94,18 +108,14 @@ const Announcement: React.FC = () => {
                 下架
               </Button>
             </Popconfirm>
-            <Button size={'small'} type={'link'}>编辑</Button>
+            <Button size={'small'} type={'link'} onClick={() => {
+              AnnouncementModal.openModal(item);
+            }}>编辑</Button>
           </>
         );
       },
     },
   ];
-
-  function refresh() {
-    bannerData.refresh();
-  }
-
-  const AnnouncementModal = useAnnouncementModal();
 
   return (
     <PageContainer>
@@ -119,7 +129,9 @@ const Announcement: React.FC = () => {
         actionRef={actionRef}
         rowKey="key"
         toolBarRender={() => [
-          <Button type="primary" key="primary" onClick={AnnouncementModal.openModal}>
+          <Button type="primary" key="primary" onClick={() => {
+            AnnouncementModal.openModal();
+          }}>
             <PlusOutlined />
             新增公告
           </Button>,

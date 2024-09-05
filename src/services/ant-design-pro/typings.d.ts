@@ -54,6 +54,16 @@ declare namespace API {
     success?: boolean;
   };
 
+  type BannerListItem = {
+    url?: string;
+    id?: number;
+    createTime?: string;
+    publishTime?: string;
+    creator?: string;
+    status?: number; // 1发布成功 2预发布  3已下架
+    remark?: string; //备注
+  }
+
   type FakeCaptcha = {
     code?: number;
     status?: string;

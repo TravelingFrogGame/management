@@ -4,11 +4,17 @@ import _ from 'lodash'
 
 export enum UploadFileType {
   Version = 0,
-  Assets = 1
+  Assets = 1,
+  Announcement
 }
 
 export const useAliOSSUploader = () => {
   const ossOptions: OSS.Options = {
+    region: 'oss-cn-chengdu',
+    accessKeyId: 'LTAI5t7VU76D7putqCRBnDdH',
+    accessKeySecret: 'B4cZBzhOqDLawTYjSE110J0c390HFF',
+    bucket: 'frogdev',
+    endpoint: 'oss-cn-chengdu.aliyuncs.com'
   } as OSS.Options;
 
   const _getBucketFileName = (fileName: string,folder: string, customFolder?: string) => {
@@ -33,6 +39,9 @@ export const useAliOSSUploader = () => {
       case UploadFileType.Version:
         folder = 'version/'
         break;
+      case UploadFileType.Announcement:
+        folder = 'announcement/'
+        break;
       default:break;
     }
     return folder;
@@ -43,12 +52,16 @@ export const useAliOSSUploader = () => {
     const bucketFileName = _getBucketFileName(fileName, folder, customFolder);
     console.log(`即将上传的oss bucket:${bucketFileName}`);
 
-    const store = new OSS(ossOptions);
-    store.put(String(bucketFileName), obj).then(res => {
-      console.log(`上传成功:${JSON.stringify(res)}`);
-    }).catch(err => {
-      console.log(`上传失败:${JSON.stringify(err)}`);
+    return new Promise((resolve, reject) => {
+      const store = new OSS(ossOptions);
+      store.put(String(bucketFileName), obj).then(res => {
+        const tmp = res as OSS.PutObjectResult;
+        resolve(tmp.url);
+      }).catch(err => {
+        reject(err);
+      })
     })
+
   }
 
   return {upload};

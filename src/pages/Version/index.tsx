@@ -274,11 +274,7 @@ const VersionList: React.FC = () => {
         // request={versionList}
         columns={columns}
         dataSource={versionData.data}
-        // rowSelection={{
-        //   onChange: (_, selectedRows) => {
-        //     setSelectedRows(selectedRows);
-        //   },
-        // }}
+        pagination={versionData.pagination}
       />
       <ModalForm
         title={'发布版本'}
