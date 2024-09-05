@@ -9,11 +9,6 @@ export enum UploadFileType {
 
 export const useAliOSSUploader = () => {
   const ossOptions: OSS.Options = {
-    region: 'oss-cn-chengdu',
-    accessKeyId: 'LTAI5t7VU76D7putqCRBnDdH',
-    accessKeySecret: 'B4cZBzhOqDLawTYjSE110J0c390HFF',
-    bucket: 'frogdev',
-    endpoint: 'oss-cn-chengdu.aliyuncs.com'
   } as OSS.Options;
 
   const _getBucketFileName = (fileName: string,folder: string, customFolder?: string) => {
