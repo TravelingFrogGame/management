@@ -8,7 +8,7 @@ interface FuncDataProxyProps {
   execution?: boolean;
 }
 
-const pageSize = 20;
+const pageSize = 5;
 
 export default function useFuncListDataProxy<T = any>(api: any, props?: FuncDataProxyProps) {
   const queryParametersRef = useRef(props?.queryParameters);
