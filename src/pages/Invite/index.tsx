@@ -4,7 +4,7 @@ import * as inviteApi from '@/services/ant-design-pro/inviteApi';
 import { InviteType } from '@/services/ant-design-pro/inviteApi';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import React, { useRef } from 'react';
-import {Button, Col, Row, Space, Statistic, StatisticProps} from "antd";
+import {Button, Col, Row, Space, Statistic, StatisticProps, Input} from "antd";
 import CountUp from 'react-countup';
 
 const formatter: StatisticProps['formatter'] = (value) => (
@@ -15,9 +15,12 @@ const Invite: React.FC = () => {
   const bannerData = useFuncListDataProxy<InviteType>(inviteApi.list, {
     execution: true,
     queryParameters: {
-      userNo: 'mtw2d1qb'
+      // phone: '18924090401'
     }
   });
+  // 18924090401
+
+  console.log(bannerData.info, '===')
 
   const actionRef = useRef<ActionType>();
 
@@ -26,12 +29,14 @@ const Invite: React.FC = () => {
       title: '新用户名称',
       dataIndex: 'userName',
       search: false,
-
     },
     {
       title: '新用户ID',
       dataIndex: 'userNo',
       search: true,
+      formItemProps: {
+        label: '手机号'
+      }
     },
     {
       title: '总消费（CNY）',
@@ -79,17 +84,22 @@ const Invite: React.FC = () => {
       content={
         <Row gutter={16}>
           <Col span={6}>
-            <Statistic title="邀请好友" value={112893} formatter={formatter} />
+            <Statistic title="邀请好友" value={bannerData.info.amount!} formatter={formatter} />
           </Col>
           <Col span={6}>
-            <Statistic title="好友累计消费" value={112893} precision={2} formatter={formatter} />
+            <Statistic title="好友累计消费" value={bannerData.info.consumeTotal!} precision={2} formatter={formatter} />
           </Col>
         </Row>
       }
     >
       <ProTable<InviteType, API.PageParams>
-        search={{
-          // filterType: 'light', // 使用轻量筛选
+        onSubmit={(e) => {
+          const phone = e.userNo;
+          bannerData.changeQueryParameters({
+            phone
+          });
+          bannerData.refresh();
+          console.log(e)
         }}
         options={{
           density: false,

@@ -20,6 +20,8 @@ export default function useFuncListDataProxy<T = any>(api: any, props?: FuncData
 
   const [moreData, setMoreData] = useState<boolean>(true);
 
+  const [info, setInfo] = useState<any>({});
+
   const [pagination, setPagination] = useState({
     total: 0,
     pageSize: pageSize,
@@ -64,6 +66,7 @@ export default function useFuncListDataProxy<T = any>(api: any, props?: FuncData
 
       flushSync(() => {
         setDataList(list);
+        setInfo(apiResultData.info || {});
         setPagination({
           total: apiResultData.total,
           pageSize
@@ -102,6 +105,7 @@ export default function useFuncListDataProxy<T = any>(api: any, props?: FuncData
   return {
     moreData,
     data: dataList,
+    info,
     change,
     changeQueryParameters,
     pagination: exportPagination as TablePaginationConfig,
