@@ -37,11 +37,11 @@ export default [
     path: '/banner',
     component: './Banner',
   },
-  {
-    name: '资产上架',
-    path: '/assets',
-    component: './Assets',
-  },
+  // {
+  //   name: '资产上架',
+  //   path: '/assets',
+  //   component: './Assets',
+  // },
   {
     name: '资产管理',
     path: '/assetManagement',
