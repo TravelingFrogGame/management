@@ -111,5 +111,3 @@ const Invite: React.FC = () => {
 };
 
 export default Invite;
-
-
