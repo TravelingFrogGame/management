@@ -3,7 +3,7 @@ import {
   ActionType,
   ProColumns,
   ProFormDateTimePicker,
-  ProFormSelect,
+  ProFormSelect, ProFormUploadButton,
 } from '@ant-design/pro-components';
 import {
   ModalForm,
@@ -19,6 +19,7 @@ import type { FormValueType } from '../TableList/components/UpdateForm';
 import useFuncListDataProxy from "@/hooks/useFuncListDataProxy";
 import * as versionApi from '@/services/ant-design-pro/versionApi';
 import {ReleaseStatus} from "@/services/ant-design-pro/enum";
+import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
 
 const VersionList: React.FC = () => {
   const versionData = useFuncListDataProxy(versionApi.versionList, {execution: true});
@@ -253,6 +254,8 @@ const VersionList: React.FC = () => {
     _operations(),
   ];
 
+  const {upload} = useAliOSSUploader();
+
   return (
     <PageContainer>
       <ProTable<API.VersionListItem, API.PageParams>
@@ -265,6 +268,7 @@ const VersionList: React.FC = () => {
             type="primary"
             key="primary"
             onClick={() => {
+              setCurrentRow(undefined);
               handleModalOpen(true);
             }}
           >
@@ -282,14 +286,18 @@ const VersionList: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
+          console.log(`需要发布的版本 : ${JSON.stringify(value)}`)
+          const {url,version} = value;
+          const zipUrl = await upload(url[0].name, url[0].originFileObj, UploadFileType.Version, version);
+          const newValue = {...value, url: zipUrl};
           let operation;
           let params;
           if (!currentRow) {
             operation = handleAdd;
-            params = value as API.VersionListItem;
+            params = newValue as API.VersionListItem;
           }else {
             operation = handleUpdate;
-            params = {...value, id: currentRow.id} as API.VersionListItem;
+            params = {...newValue, id: currentRow.id} as API.VersionListItem;
           }
           const success = await operation(params);
           if (success) {
@@ -315,18 +323,29 @@ const VersionList: React.FC = () => {
           placeholder={'请输入版本号'}
           initialValue={currentRow?.version ?? ''}
         />
-        <ProFormText
-          label={'下载地址'}
-          rules={[
-            {
-              required: true,
-              message: '热更包地址不能为空',
-            },
-          ]}
-          width="md"
-          name="url"
-          placeholder={'请输入热更包下载地址'}
-          initialValue={currentRow?.url ?? ''}
+        {/*<ProFormText*/}
+        {/*  label={'下载地址'}*/}
+        {/*  rules={[*/}
+        {/*    {*/}
+        {/*      required: true,*/}
+        {/*      message: '热更包地址不能为空',*/}
+        {/*    },*/}
+        {/*  ]}*/}
+        {/*  width="md"*/}
+        {/*  name="url"*/}
+        {/*  placeholder={'请输入热更包下载地址'}*/}
+        {/*  initialValue={currentRow?.url ?? ''}*/}
+        {/*/>*/}
+        <ProFormUploadButton
+          label={'热更包'}
+          name={'url'}
+          rules={[{required: true, message: '热更包不能为空'}]}
+          fieldProps={{
+            listType: 'picture-card',
+            accept: '.ZIP, .zip',
+            maxCount: 1,
+          }}
+          // initialValue={[currentItem?.url]}
         />
         <ProFormSelect
           label={'发布平台'}

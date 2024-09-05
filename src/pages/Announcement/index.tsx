@@ -82,7 +82,7 @@ const Announcement: React.FC = () => {
     },
     {
       title: '创建人',
-      dataIndex: 'create',
+      dataIndex: 'creator',
     },
     {
       title: '备注',
@@ -138,6 +138,7 @@ const Announcement: React.FC = () => {
         ]}
         columns={columns}
         dataSource={bannerData.data}
+        pagination={bannerData.pagination}
       />
       {AnnouncementModal.node}
     </PageContainer>

@@ -3,7 +3,7 @@ import {
   ActionType,
   ProColumns,
   ProFormDateTimePicker,
-  ProFormSelect,
+  ProFormSelect, ProFormUploadButton,
 } from '@ant-design/pro-components';
 import {
   ModalForm,
@@ -13,29 +13,31 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage } from '@umijs/max';
-import {Button, message, Popconfirm} from 'antd';
+import {Button, Image, message, Popconfirm} from 'antd';
 import React, {useRef, useState} from 'react';
 import type { FormValueType } from '../TableList/components/UpdateForm';
 import useFuncListDataProxy from "@/hooks/useFuncListDataProxy";
-import * as versionApi from '@/services/ant-design-pro/versionApi';
 import {ReleaseStatus} from "@/services/ant-design-pro/enum";
+import {bannerAdd, bannerClose, BannerItem, bannerList, bannerUpdate} from "@/services/ant-design-pro/bannerApi";
+import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
+import {DataUtils} from "@/utils/DataUtils";
 
 const Banner: React.FC = () => {
-  const versionData = useFuncListDataProxy(versionApi.versionList, {execution: true});
+  const bannerData = useFuncListDataProxy(bannerList, {execution: true});
 
   /**
    * @en-US Add node
    * @zh-CN 添加节点
    * @param fields
    */
-  const handleAdd = async (fields: API.VersionListItem) => {
+  const handleAdd = async (fields: BannerItem) => {
     const hide = message.loading('正在添加');
     try {
-      const {success,msg} = await versionApi.addVersion({...fields})
+      const {success,msg} = await bannerAdd({...fields})
       hide();
       if (success) {
         message.success('版本添加成功');
-        versionData.refresh();
+        bannerData.refresh();
       }else {
         message.error(`版本添加失败，请重试: ${msg}`);
       }
@@ -56,11 +58,11 @@ const Banner: React.FC = () => {
   const handleUpdate = async (fields: FormValueType) => {
     const hide = message.loading('Configuring');
     try {
-      const {success,msg} = await versionApi.update({...fields})
+      const {success,msg} = await bannerUpdate({...fields})
       hide();
       if (success) {
         message.success('更新成功');
-        versionData.refresh();
+        bannerData.refresh();
       }else {
         message.error(`更新失败，请重试: ${msg}`);
       }
@@ -78,16 +80,16 @@ const Banner: React.FC = () => {
    *
    * @param clickRow
    */
-  const handleRemove = async (clickRow: API.VersionListItem) => {
+  const handleRemove = async (clickRow: BannerItem) => {
     const hide = message.loading('正在删除');
     if (!clickRow) return true;
     console.log(`删除节点 : ${JSON.stringify(clickRow)}`)
     try {
-      const {success, msg} = await versionApi.unRelease({id: Number(clickRow.id)})
+      const {success, msg} = await bannerClose({id: Number(clickRow.id)})
       hide();
       if (success) {
         message.success('下架成功');
-        versionData.refresh();
+        bannerData.refresh();
       }else {
         message.error(`下架失败，请重试: ${msg}`);
       }
@@ -104,13 +106,16 @@ const Banner: React.FC = () => {
   const [createModalOpen, handleModalOpen] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.VersionListItem>();
+  const [currentRow, setCurrentRow] = useState<BannerItem>();
 
   const _version = () => {
     return {
       title: '图片',
-      dataIndex: 'version',
-    } as ProColumns<API.VersionListItem>
+      dataIndex: 'image',
+      render: (dom, entity, index, action, schema) => {
+        return <Image src={entity.image}/>
+      }
+    } as ProColumns<BannerItem>
   }
 
   const _download = () => {
@@ -118,12 +123,12 @@ const Banner: React.FC = () => {
       title: '跳转URL',
       dataIndex: 'url',
       // hideInForm: true,
-      renderText: () =>
-        '下载',
+      renderText: (val) =>
+        `${val}`,
       render: (dom, entity) => {
         return <a href={entity.url}>{dom}</a>
       }
-    }as ProColumns<API.VersionListItem>
+    }as ProColumns<BannerItem>
   }
 
   const _status = () => {
@@ -158,7 +163,7 @@ const Banner: React.FC = () => {
       dataIndex: 'createTime',
       valueType: 'textarea',
       sorter: true,
-    } as ProColumns<API.VersionListItem>
+    } as ProColumns<BannerItem>
   }
 
   const _createUser = () => {
@@ -166,7 +171,7 @@ const Banner: React.FC = () => {
       title: '创建人',
       dataIndex: 'creator',
       valueType: 'textarea',
-    } as ProColumns<API.VersionListItem>
+    } as ProColumns<BannerItem>
   }
 
   const _tips = () => {
@@ -174,7 +179,7 @@ const Banner: React.FC = () => {
       title: '备注',
       dataIndex: 'remark',
       valueType: 'textarea',
-    } as ProColumns<API.VersionListItem>
+    } as ProColumns<BannerItem>
   }
 
   const _operations = () => {
@@ -212,10 +217,10 @@ const Banner: React.FC = () => {
         }
         return operations;
       },
-    } as ProColumns<API.VersionListItem>
+    } as ProColumns<BannerItem>
   }
 
-  const columns: ProColumns<API.VersionListItem>[] = [
+  const columns: ProColumns<BannerItem>[] = [
     _version(),
     _status(),
     _download(),
@@ -225,9 +230,11 @@ const Banner: React.FC = () => {
     _operations(),
   ];
 
+  const {upload} = useAliOSSUploader();
+
   return (
     <PageContainer>
-      <ProTable<API.VersionListItem, API.PageParams>
+      <ProTable<BannerItem, API.PageParams>
         // headerTitle={'版本管理'}
         actionRef={actionRef}
         rowKey="key"
@@ -245,8 +252,8 @@ const Banner: React.FC = () => {
         ]}
         // request={versionList}
         columns={columns}
-        dataSource={versionData.data}
-        pagination={versionData.pagination}
+        dataSource={bannerData.data}
+        pagination={bannerData.pagination}
       />
       <ModalForm
         title={'发布版本'}
@@ -254,16 +261,23 @@ const Banner: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
+          const hide = message.loading('处理中。。。');
+
+          const {image} = value;
+          const imageUrl = await upload(image[0].name, image[0].originFileObj, UploadFileType.Banner);
+          const newValue = {...value, image: imageUrl};
+
           let operation;
           let params;
           if (!currentRow) {
             operation = handleAdd;
-            params = value as API.VersionListItem;
+            params = newValue as BannerItem;
           }else {
             operation = handleUpdate;
-            params = {...value, id: currentRow.id} as API.VersionListItem;
+            params = {...newValue, id: currentRow.id} as BannerItem;
           }
           const success = await operation(params);
+          hide();
           if (success) {
             setCurrentRow(undefined);
             handleModalOpen(false);
@@ -274,40 +288,16 @@ const Banner: React.FC = () => {
         }}
         modalProps={{destroyOnClose: true}}
       >
-        <ProFormText
-          label={'版本号'}
-          rules={[
-            {
-              required: true,
-              message: '版本号不能为空',
-            },
-          ]}
-          width="md"
-          name="version"
-          placeholder={'请输入版本号'}
-          initialValue={currentRow?.version ?? ''}
-        />
-        <ProFormText
-          label={'下载地址'}
-          rules={[
-            {
-              required: true,
-              message: '热更包地址不能为空',
-            },
-          ]}
-          width="md"
-          name="url"
-          placeholder={'请输入热更包下载地址'}
-          initialValue={currentRow?.url ?? ''}
-        />
-        <ProFormSelect
-          label={'发布平台'}
-          width="md"
-          placeholder={'请选择发布平台'}
-          rules={[{required: true, message: '发布平台不能为空'}]}
-          name={'platform'}
-          options={[{label: '苹果',value: 'ios'},{label: '安卓',value: 'android'}]}
-          initialValue={currentRow?.platform ?? ''}
+        <ProFormUploadButton
+          label={'选择图片'}
+          name={'image'}
+          rules={[{required: true, message: '图片不能为空'}]}
+          fieldProps={{
+            listType: 'picture-card',
+            accept: '.png, .jpg, .jpeg',
+            maxCount: 1,
+          }}
+          // initialValue={[currentItem?.url]}
         />
         <ProFormDateTimePicker
           label={'发布时间'}
@@ -316,15 +306,14 @@ const Banner: React.FC = () => {
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
           fieldProps={{format: 'YY/MM/DD hh:mm:ss'}}
-          // initialValue={currentRow?.publishTime ?? currentRow?.createTime}
+          // initialValue={new Date(currentItem?.publishTime)}
         />
-        <ProFormTextArea
-          label={'更新内容'}
-          placeholder={'更新内容'}
+        <ProFormText
+          label={'跳转路由'}
           width="md"
-          name="updateContent"
-          rules={[{required: true,message: '更新内容不能为空'}]}
-          initialValue={currentRow?.updateContent ?? ''}
+          name="url"
+          placeholder={'请输入热更包下载地址'}
+          initialValue={currentRow?.url ?? ''}
         />
         <ProFormTextArea
           label={'备注'}

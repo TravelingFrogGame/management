@@ -5,7 +5,8 @@ import _ from 'lodash'
 export enum UploadFileType {
   Version = 0,
   Assets = 1,
-  Announcement
+  Announcement,
+  Banner
 }
 
 export const useAliOSSUploader = () => {
@@ -41,6 +42,9 @@ export const useAliOSSUploader = () => {
         break;
       case UploadFileType.Announcement:
         folder = 'announcement/'
+        break;
+      case UploadFileType.Banner:
+        folder = 'banners/'
         break;
       default:break;
     }
