@@ -5,7 +5,7 @@ import React, { useRef } from 'react';
 import {Button} from "antd";
 import * as assetApi from '@/services/ant-design-pro/assetApi'
 import {AssetType} from "@/services/ant-design-pro/assetApi";
-import {useAssetModal} from "@/pages/AssetManagement/components/AnnouncementModal";
+import {useAssetModal} from "@/pages/AssetManagement/components/AssetModal";
 
 
 const Invite: React.FC = () => {

@@ -1,11 +1,12 @@
 import useFuncListDataProxy from '@/hooks/useFuncListDataProxy';
-import { useAnnouncementModal } from '@/pages/Announcement/components/AnnouncementModal';
+import {useAnnouncementModal} from '@/pages/Announcement/components/AnnouncementModal';
 import * as announcementApi from '@/services/ant-design-pro/announcementApi';
-import { AnnouncementType } from '@/services/ant-design-pro/announcementApi';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message, Popconfirm } from 'antd';
 import React, { useRef } from 'react';
+import {AnnouncementType} from '@/services/ant-design-pro/announcementApi';
 import {PlusOutlined} from "@ant-design/icons";
+import {ReleaseStatus} from "@/services/ant-design-pro/enum";
 
 const Announcement: React.FC = () => {
   const bannerData = useFuncListDataProxy<AnnouncementType>(announcementApi.list, {
@@ -15,11 +16,11 @@ const Announcement: React.FC = () => {
   async function confirmDelete(item: AnnouncementType) {
     const apiResult = await announcementApi.close({ id: item.id });
     if (apiResult.success) {
-      message.success('删除成功');
+      message.success('下架成功');
       bannerData.refresh();
       return;
     }
-    message.error('删除失败');
+    message.error('下架失败');
   }
 
   const actionRef = useRef<ActionType>();
@@ -29,7 +30,8 @@ const Announcement: React.FC = () => {
       title: '标题',
       dataIndex: 'title',
       render: (dom, entity) => {
-        return <a onClick={() => {}}>{dom}</a>;
+        return <a onClick={() => {
+        }}>{dom}</a>;
       },
     },
     {
@@ -76,17 +78,20 @@ const Announcement: React.FC = () => {
       title: '操作',
       dataIndex: 'op',
       render(d_, item) {
+        if (item.status === ReleaseStatus.Removed) {
+          return null;
+        }
         return (
           <>
             <Popconfirm
               placement="topLeft"
-              title={'确认删除吗'}
+              title={'确认下架吗'}
               onConfirm={() => {
                 confirmDelete(item);
               }}
             >
               <Button type={'link'} size={'small'} danger>
-                删除
+                下架
               </Button>
             </Popconfirm>
             <Button size={'small'} type={'link'}>编辑</Button>
