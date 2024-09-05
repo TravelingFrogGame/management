@@ -13,13 +13,12 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage } from '@umijs/max';
-import {Button, message} from 'antd';
+import {Button, message, Popconfirm} from 'antd';
 import React, {useRef, useState} from 'react';
 import type { FormValueType } from '../TableList/components/UpdateForm';
 import useFuncListDataProxy from "@/hooks/useFuncListDataProxy";
 import * as versionApi from '@/services/ant-design-pro/versionApi';
-import {VersionStatus} from "@/services/ant-design-pro/enum";
-import dayjs from "dayjs";
+import {ReleaseStatus} from "@/services/ant-design-pro/enum";
 
 const VersionList: React.FC = () => {
   const versionData = useFuncListDataProxy(versionApi.versionList, {execution: true});
@@ -220,14 +219,20 @@ const VersionList: React.FC = () => {
         >
           编辑
         </a>);
-        const UnReleaseNode = <a key="subscribeAlert" onClick={() => {
-          handleRemove(record);
-        }}>
-          下架
-        </a>;
+        const UnReleaseNode = <Popconfirm
+          placement="topLeft"
+          title={'确认下架吗'}
+          onConfirm={() => {
+            handleRemove(record);
+          }}
+        >
+          <Button type={'link'} size={'small'} danger>
+            下架
+          </Button>
+        </Popconfirm>;
 
         let operations = [EditNode, UnReleaseNode];
-        if (record.status === VersionStatus.Removed) {
+        if (record.status === ReleaseStatus.Removed) {
           operations = [];
         }
         return operations;
@@ -281,16 +286,18 @@ const VersionList: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          setCurrentRow(undefined);
-
           let operation;
-          if (currentRow) {
+          let params;
+          if (!currentRow) {
             operation = handleAdd;
+            params = value as API.VersionListItem;
           }else {
             operation = handleUpdate;
+            params = {...value, id: currentRow.id} as API.VersionListItem;
           }
-          const success = await operation(value as API.VersionListItem);
+          const success = await operation(params);
           if (success) {
+            setCurrentRow(undefined);
             handleModalOpen(false);
             if (actionRef.current) {
               actionRef.current.reload();
