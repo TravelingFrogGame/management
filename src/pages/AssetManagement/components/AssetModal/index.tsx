@@ -6,7 +6,7 @@ interface ModalNodeProps {
   open: boolean;
 }
 
-export function useAnnouncementModal(callback?: () => void) {
+export function useAssetModal(callback?: () => void) {
   const [open, setOpen] = useState(false);
 
   function closeModal() {

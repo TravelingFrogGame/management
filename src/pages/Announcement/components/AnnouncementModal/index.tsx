@@ -1,22 +1,30 @@
 import { Button, Drawer, Space } from 'antd';
 import { useState } from 'react';
+import {AssetType} from "@/services/ant-design-pro/assetApi";
+import {flushSync} from "react-dom";
 
 interface ModalNodeProps {
-  closeModal(): () => void;
+  closeModal: () => void;
   open: boolean;
 }
 
-export function useAnnouncementModal(callback?: () => void) {
+export function useAnnouncementModal() {
   const [open, setOpen] = useState(false);
+  const [asset, setAsset] = useState<AssetType>();
+
 
   function closeModal() {
     setOpen(false);
   }
-  function openModal() {
-    setOpen(true);
+
+  function openModal(asset: AssetType) {
+    flushSync(async () => {
+      setAsset(asset);
+      setOpen(true);
+    })
   }
   return {
-    node: <ModalNode open={open} closeModal={closeModal} />,
+    node: <ModalNode open={open} asset={asset} closeModal={closeModal} />,
     openModal,
   };
 }
