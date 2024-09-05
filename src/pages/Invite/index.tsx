@@ -20,7 +20,6 @@ const Invite: React.FC = () => {
   });
   // 18924090401
 
-  console.log(bannerData.info, '===')
 
   const actionRef = useRef<ActionType>();
 
@@ -75,7 +74,11 @@ const Invite: React.FC = () => {
 
   const InviteModal = useAnnouncementModal();
 
-  function exportCVS() {
+  async function exportCVS() {
+    const queryParameters = bannerData.getQueryParameters();
+    if (queryParameters.phone) {
+      window.open(`/gm/invite/csv?phone=${queryParameters.phone}&pageSize=${queryParameters.pageSize}&page=${queryParameters.page}`)
+    }
 
   }
 

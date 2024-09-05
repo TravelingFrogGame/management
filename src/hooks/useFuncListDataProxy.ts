@@ -8,7 +8,7 @@ interface FuncDataProxyProps {
   execution?: boolean;
 }
 
-const pageSize = 5;
+const pageSize = 20;
 
 export default function useFuncListDataProxy<T = any>(api: any, props?: FuncDataProxyProps) {
   const queryParametersRef = useRef(props?.queryParameters);
@@ -102,12 +102,24 @@ export default function useFuncListDataProxy<T = any>(api: any, props?: FuncData
     }
   }, [pagination, change]);
 
+  function getQueryParameters () {
+    const currentIndex = pageIndexRef.current;
+
+    const queryParameters = queryParametersRef.current || {};
+    return {
+      ...queryParameters,
+      pageSize,
+      page: currentIndex,
+    };
+  }
+
   return {
     moreData,
     data: dataList,
     info,
     change,
     changeQueryParameters,
+    getQueryParameters,
     pagination: exportPagination as TablePaginationConfig,
     pullIng,
     init,
