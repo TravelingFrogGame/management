@@ -1,11 +1,10 @@
 import useFuncListDataProxy from '@/hooks/useFuncListDataProxy';
-import { useAnnouncementModal } from '@/pages/Announcement/components/AnnouncementModal';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import React, { useRef } from 'react';
 import {Button} from "antd";
 import * as assetApi from '@/services/ant-design-pro/assetApi'
 import {AssetType} from "@/services/ant-design-pro/assetApi";
-import {useAssetModal} from "@/pages/AssetManagement/components/AssetModal";
+import {useAssetModal} from "./components/AssetModal/index";
 
 
 const Invite: React.FC = () => {
@@ -23,9 +22,6 @@ const Invite: React.FC = () => {
   function refresh() {
     bannerData.refresh();
   }
-
-  const InviteModal = useAnnouncementModal();
-
   const columns: ProColumns<AssetType>[] = [
     {
       title: '名称',
@@ -63,7 +59,7 @@ const Invite: React.FC = () => {
       title: '操作',
       search: false,
       render(_, item) {
-        return <Button type={'link'} onClick={() => {InviteModal.openModal(item)}}>查看配置</Button>
+        return <Button type={'link'} onClick={() => {AssetModal.openModal(item)}}>查看配置</Button>
       }
     },
   ];
@@ -95,7 +91,6 @@ const Invite: React.FC = () => {
         rowKey="key"
         columns={columns}
         dataSource={bannerData.data} />
-      {InviteModal.node}
     </PageContainer>
   );
 };

@@ -1,5 +1,7 @@
 import { Button, Drawer, Space } from 'antd';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import {AssetType} from "@/services/ant-design-pro/assetApi";
+import {flushSync} from "react-dom";
 
 interface ModalNodeProps {
   closeModal(): () => void;
@@ -8,15 +10,21 @@ interface ModalNodeProps {
 
 export function useAssetModal(callback?: () => void) {
   const [open, setOpen] = useState(false);
+  const [asset, setAsset] = useState<AssetType>();
+
 
   function closeModal() {
     setOpen(false);
   }
-  function openModal() {
-    setOpen(true);
+
+  function openModal(asset: AssetType) {
+    flushSync(async () => {
+      setAsset(asset);
+      setOpen(true);
+    })
   }
   return {
-    node: <ModalNode open={open} closeModal={closeModal} />,
+    node: <ModalNode open={open} asset={asset} closeModal={closeModal} />,
     openModal,
   };
 }
@@ -26,8 +34,8 @@ function ModalNode(props: ModalNodeProps) {
 
   return (
     <Drawer
-      title="新增公告"
-      width={500}
+      title="11"
+      width={800}
       open={open}
       onClose={closeModal}
       extra={

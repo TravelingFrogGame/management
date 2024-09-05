@@ -1,6 +1,4 @@
 import {Button, Drawer, Form, Space} from 'antd';
-import {AssetType} from "@/services/ant-design-pro/assetApi";
-import {flushSync} from "react-dom";
 import React, {useState} from 'react';
 import {ProFormDateTimePicker, ProFormText, ProFormTextArea, ProFormUploadButton} from "@ant-design/pro-components";
 import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
@@ -11,23 +9,17 @@ interface ModalNodeProps {
   open: boolean;
 }
 
-export function useAnnouncementModal() {
+export function useAnnouncementModal(callback?: () => void) {
   const [open, setOpen] = useState(false);
-  const [asset, setAsset] = useState<AssetType>();
-
 
   function closeModal() {
     setOpen(false);
   }
-
-  function openModal(asset: AssetType) {
-    flushSync(async () => {
-      setAsset(asset);
-      setOpen(true);
-    })
+  function openModal() {
+    setOpen(true);
   }
   return {
-    node: <ModalNode open={open} asset={asset} closeModal={closeModal} />,
+    node: <ModalNode open={open} closeModal={closeModal} />,
     openModal,
   };
 }
@@ -119,7 +111,7 @@ function ModalNode(props: ModalNodeProps) {
             action: (file: RcFile) => {
               console.log(`file : ${JSON.stringify(file)}`)
             }
-        }}
+          }}
           onChange={(e) => {
             upload(e.file.name, e.file.originFileObj, UploadFileType.Version)
           }}
