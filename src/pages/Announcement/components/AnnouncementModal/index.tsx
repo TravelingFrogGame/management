@@ -7,6 +7,7 @@ import {DataUtils} from "@/utils/DataUtils";
 import getCommonTime = DataUtils.getCommonTime;
 import dayjs from "dayjs";
 import CommonTimeFormatter = DataUtils.CommonTimeFormatter;
+import {UploadFile} from "antd/lib";
 
 interface ModalNodeProps {
   closeModal(): () => void;
@@ -41,19 +42,29 @@ function ModalNode(props: ModalNodeProps) {
   const {upload} = useAliOSSUploader();
 
   const [initItem, setInitItem] = useState<AnnouncementType | undefined>(currentItem);
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
   useEffect(() => {
     setInitItem(currentItem);
+    if (!DataUtils.isUndefined(currentItem)) {
+      setFileList([{uid: '-1', name: 'test.png', status: 'done', url: currentItem?.url}])
+    }
   }, [currentItem]);
-// console.log(`show item : ${JSON.stringify(initItem)}`);
+
+  const _close = () => {
+    setFileList([]);
+    console.log(`调用隐藏了吗 : ${JSON.stringify(fileList)}`);
+    closeModal()?.();
+  }
+
   return (
     <Drawer
       title="新增公告"
       width={500}
       open={open}
-      onClose={closeModal}
+      onClose={_close}
       extra={
         <Space>
-          <Button onClick={closeModal}>取消</Button>
+          <Button onClick={_close}>取消</Button>
           <Button type="primary" onClick={() => {form.submit();}}>
             确定
           </Button>
@@ -65,8 +76,13 @@ function ModalNode(props: ModalNodeProps) {
         form={form}
         onFinish={async (value) => {
           const hide = message.loading('处理中。。。');
-
+          console.log(`公告处理数据 : ${JSON.stringify(value)}`);
           const {url} = value;
+          if (value && value.hasOwnProperty('title')) {
+            hide();
+            _close();
+            return;
+          }
           const imageUrl = await upload(url[0].name, url[0].originFileObj, UploadFileType.Announcement);
           const newValue = {...value, url: imageUrl,publishTime: DataUtils.getCommonTime(value.publishTime)};
 
@@ -126,7 +142,8 @@ function ModalNode(props: ModalNodeProps) {
             accept: '.png, .jpg, .jpeg',
             maxCount: 1,
           }}
-          // initialValue={[currentItem?.url]}
+          fileList={fileList}
+          initialValue={currentItem}
         />
         <ProFormDateTimePicker
           label={'发布时间'}
@@ -135,7 +152,7 @@ function ModalNode(props: ModalNodeProps) {
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
           fieldProps={{format: CommonTimeFormatter}}
-          initialValue={dayjs(currentItem?.publishTime)}
+          initialValue={currentItem?.publishTime}
         />
         <ProFormTextArea
           label={'备注'}

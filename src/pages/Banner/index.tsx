@@ -14,7 +14,7 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage } from '@umijs/max';
 import {Button, Image, message, Popconfirm} from 'antd';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import type { FormValueType } from '../TableList/components/UpdateForm';
 import useFuncListDataProxy from "@/hooks/useFuncListDataProxy";
 import {ReleaseStatus} from "@/services/ant-design-pro/enum";
@@ -23,6 +23,7 @@ import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
 import {DataUtils} from "@/utils/DataUtils";
 import dayjs from "dayjs";
 import CommonTimeFormatter = DataUtils.CommonTimeFormatter;
+import {UploadFile} from "antd/lib";
 
 const Banner: React.FC = () => {
   const bannerData = useFuncListDataProxy(bannerList, {execution: true});
@@ -233,6 +234,14 @@ const Banner: React.FC = () => {
   ];
 
   const {upload} = useAliOSSUploader();
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  useEffect(() => {
+    if(!DataUtils.isUndefined(currentRow)){
+      setFileList([{uid: '-1', name: 'test.png', status: 'done', url: currentRow?.image}])
+    }else {
+      setFileList([])
+    }
+  }, [currentRow]);
 
   return (
     <PageContainer>
@@ -266,8 +275,13 @@ const Banner: React.FC = () => {
         // initialValues={currentRow}
         onFinish={async (value) => {
           const hide = message.loading('处理中。。。');
-
+          console.log(`banner 处理数据 : ${JSON.stringify(value)}`);
           const {image} = value;
+          if (Number(image[0].uid ) === -1) {
+            hide();
+            handleModalOpen(false);
+            return;
+          }
           const imageUrl = await upload(image[0].name, image[0].originFileObj, UploadFileType.Banner);
           const newValue = {...value, image: imageUrl};
 
@@ -301,14 +315,8 @@ const Banner: React.FC = () => {
             accept: '.png, .jpg, .jpeg',
             maxCount: 1,
           }}
-          // valuePropName={'image'}
-          // getValueFromEvent={e => {
-          //   if (Array.isArray(e)) {
-          //     return e;
-          //   }
-          //   return e && e.image;
-          // }}
-          // initialValue={[currentItem?.url]}
+          initialValue={fileList}
+          fileList={fileList}
         />
         <ProFormDateTimePicker
           label={'发布时间'}
@@ -317,7 +325,7 @@ const Banner: React.FC = () => {
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
           fieldProps={{format: CommonTimeFormatter}}
-          initialValue={dayjs(currentRow?.publishTime)}
+          initialValue={currentRow?.publishTime}
         />
         <ProFormText
           label={'跳转路由'}

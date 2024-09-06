@@ -14,7 +14,7 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage } from '@umijs/max';
 import {Button, message, Popconfirm} from 'antd';
-import React, {useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import type { FormValueType } from '../TableList/components/UpdateForm';
 import useFuncListDataProxy from "@/hooks/useFuncListDataProxy";
 import * as versionApi from '@/services/ant-design-pro/versionApi';
@@ -23,6 +23,7 @@ import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
 import dayjs from "dayjs";
 import {DataUtils} from "@/utils/DataUtils";
 import CommonTimeFormatter = DataUtils.CommonTimeFormatter;
+import {UploadFile} from "antd/lib";
 
 const VersionList: React.FC = () => {
   const versionData = useFuncListDataProxy(versionApi.versionList, {execution: true});
@@ -258,6 +259,18 @@ const VersionList: React.FC = () => {
   ];
 
   const {upload} = useAliOSSUploader();
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  useEffect(() => {
+    if(!DataUtils.isUndefined(currentRow)){
+      let name = 'main.jsbundle.zip';
+      if (currentRow.platform === 'android') {
+        name = 'index.android.bundle.zip'
+      }
+      setFileList([{uid: '-1', name: name, status: 'done', url: currentRow?.url}])
+    }else {
+      setFileList([])
+    }
+  }, [currentRow]);
 
   return (
     <PageContainer>
@@ -292,6 +305,10 @@ const VersionList: React.FC = () => {
         onFinish={async (value) => {
           console.log(`需要发布的版本 : ${JSON.stringify(value)}`)
           const {url,version} = value;
+          if (Number(url[0].uid ) === -1) {
+            handleModalOpen(false);
+            return;
+          }
           const zipUrl = await upload(url[0].name, url[0].originFileObj, UploadFileType.Version, version);
           const newValue = {...value, url: zipUrl};
           let operation;
@@ -327,19 +344,6 @@ const VersionList: React.FC = () => {
           placeholder={'请输入版本号'}
           initialValue={currentRow?.version ?? ''}
         />
-        {/*<ProFormText*/}
-        {/*  label={'下载地址'}*/}
-        {/*  rules={[*/}
-        {/*    {*/}
-        {/*      required: true,*/}
-        {/*      message: '热更包地址不能为空',*/}
-        {/*    },*/}
-        {/*  ]}*/}
-        {/*  width="md"*/}
-        {/*  name="url"*/}
-        {/*  placeholder={'请输入热更包下载地址'}*/}
-        {/*  initialValue={currentRow?.url ?? ''}*/}
-        {/*/>*/}
         <ProFormUploadButton
           label={'热更包'}
           name={'url'}
@@ -349,7 +353,8 @@ const VersionList: React.FC = () => {
             accept: '.ZIP, .zip',
             maxCount: 1,
           }}
-          // initialValue={[currentItem?.url]}
+          initialValue={fileList}
+          fileList={fileList}
         />
         <ProFormSelect
           label={'发布平台'}
@@ -367,8 +372,7 @@ const VersionList: React.FC = () => {
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
           fieldProps={{format: CommonTimeFormatter}}
-          valuePropName={'publishTime'}
-          initialValue={dayjs(currentRow?.publishTime)}
+          initialValue={currentRow?.publishTime}
         />
         <ProFormTextArea
           label={'更新内容'}
