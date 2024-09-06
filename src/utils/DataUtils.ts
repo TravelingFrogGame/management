@@ -53,7 +53,7 @@ export namespace DataUtils {
     return (decimal * 100).toFixed(2) + '%'; // 保留两位小数
   };
 
-  export const CommonTimeFormatter ='YYYY/MM/DD hh:mm:ss';
+  export const CommonTimeFormatter ='YYYY/MM/DD HH:mm:ss';
 
   export const getCommonTime = (timeString?: string) => {
 
