@@ -2,6 +2,7 @@ import {ProColumns} from "@ant-design/pro-components";
 import {AssetType} from "@/services/ant-design-pro/assetApi";
 import dayjs from "dayjs";
 
+
 export const postcardColumns = [
   {
     title: '名称',
@@ -200,8 +201,9 @@ export const specialtyColumns = [
   }, {
     title: '掉落地区',
     // todo
-    dataIndex: 'description',
+    // dataIndex: 'description',
     search: false,
+
   }
 ];
 
