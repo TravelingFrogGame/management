@@ -42,19 +42,21 @@ function ModalNode(props: ModalNodeProps) {
   const {upload} = useAliOSSUploader();
 
   const [initItem, setInitItem] = useState<AnnouncementType | undefined>(currentItem);
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[] | undefined>([]);
   useEffect(() => {
     setInitItem(currentItem);
+
     if (!DataUtils.isUndefined(currentItem)) {
       setFileList([{uid: '-1', name: 'test.png', status: 'done', url: currentItem?.url}])
     }
+
   }, [currentItem]);
 
   const _close = () => {
-    setFileList([]);
-    console.log(`调用隐藏了吗 : ${JSON.stringify(fileList)}`);
     closeModal()?.();
   }
+
+  console.log(`fileList : ${JSON.stringify(fileList)}`)
 
   return (
     <Drawer
@@ -78,7 +80,7 @@ function ModalNode(props: ModalNodeProps) {
           const hide = message.loading('处理中。。。');
           console.log(`公告处理数据 : ${JSON.stringify(value)}`);
           const {url} = value;
-          if (value && value.hasOwnProperty('title')) {
+          if (url && url.hasOwnProperty('content')) {
             hide();
             _close();
             return;
@@ -142,8 +144,16 @@ function ModalNode(props: ModalNodeProps) {
             accept: '.png, .jpg, .jpeg',
             maxCount: 1,
           }}
-          fileList={fileList}
+          fileList={DataUtils.isUndefined(currentItem) ? undefined : fileList}
           initialValue={currentItem}
+          onChange={(info) => {
+            setFileList(info.fileList.map(obj => {
+              return {
+                ...obj,
+                status: 'done'
+              }
+            }));
+          }}
         />
         <ProFormDateTimePicker
           label={'发布时间'}

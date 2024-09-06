@@ -130,7 +130,7 @@ const Announcement: React.FC = () => {
         rowKey="key"
         toolBarRender={() => [
           <Button type="primary" key="primary" onClick={() => {
-            AnnouncementModal.openModal();
+            AnnouncementModal.openModal(undefined);
           }}>
             <PlusOutlined />
             新增公告

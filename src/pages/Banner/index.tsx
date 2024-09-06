@@ -39,15 +39,15 @@ const Banner: React.FC = () => {
       const {success,msg} = await bannerAdd({...fields})
       hide();
       if (success) {
-        message.success('版本添加成功');
+        message.success('发布成功');
         bannerData.refresh();
       }else {
-        message.error(`版本添加失败，请重试: ${msg}`);
+        message.error(`发布失败，请重试: ${msg}`);
       }
       return success;
     } catch (error) {
       hide();
-      message.error('版本添加失败，请重试');
+      message.error('发布失败，请重试');
       return false;
     }
   };
@@ -234,12 +234,12 @@ const Banner: React.FC = () => {
   ];
 
   const {upload} = useAliOSSUploader();
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[] | undefined>();
   useEffect(() => {
     if(!DataUtils.isUndefined(currentRow)){
       setFileList([{uid: '-1', name: 'test.png', status: 'done', url: currentRow?.image}])
     }else {
-      setFileList([])
+      setFileList(undefined)
     }
   }, [currentRow]);
 
@@ -268,7 +268,7 @@ const Banner: React.FC = () => {
         pagination={bannerData.pagination}
       />
       <ModalForm
-        title={'发布版本'}
+        title={'发布公告'}
         width="400px"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
@@ -317,6 +317,14 @@ const Banner: React.FC = () => {
           }}
           initialValue={fileList}
           fileList={fileList}
+          onChange={(info) => {
+            setFileList(info.fileList.map(obj => {
+              return {
+                ...obj,
+                status: 'done'
+              }
+            }));
+          }}
         />
         <ProFormDateTimePicker
           label={'发布时间'}

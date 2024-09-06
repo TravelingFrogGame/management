@@ -259,7 +259,7 @@ const VersionList: React.FC = () => {
   ];
 
   const {upload} = useAliOSSUploader();
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
+  const [fileList, setFileList] = useState<UploadFile[] | undefined>();
   useEffect(() => {
     if(!DataUtils.isUndefined(currentRow)){
       let name = 'main.jsbundle.zip';
@@ -268,7 +268,7 @@ const VersionList: React.FC = () => {
       }
       setFileList([{uid: '-1', name: name, status: 'done', url: currentRow?.url}])
     }else {
-      setFileList([])
+      setFileList(undefined)
     }
   }, [currentRow]);
 
@@ -355,6 +355,14 @@ const VersionList: React.FC = () => {
           }}
           initialValue={fileList}
           fileList={fileList}
+          onChange={(info) => {
+            setFileList(info.fileList.map(obj => {
+              return {
+                ...obj,
+                status: 'done'
+              }
+            }));
+          }}
         />
         <ProFormSelect
           label={'发布平台'}
