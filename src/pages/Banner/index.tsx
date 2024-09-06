@@ -21,6 +21,7 @@ import {ReleaseStatus} from "@/services/ant-design-pro/enum";
 import {bannerAdd, bannerClose, BannerItem, bannerList, bannerUpdate} from "@/services/ant-design-pro/bannerApi";
 import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
 import {DataUtils} from "@/utils/DataUtils";
+import dayjs from "dayjs";
 
 const Banner: React.FC = () => {
   const bannerData = useFuncListDataProxy(bannerList, {execution: true});
@@ -244,6 +245,7 @@ const Banner: React.FC = () => {
             type="primary"
             key="primary"
             onClick={() => {
+              setCurrentRow(undefined);
               handleModalOpen(true);
             }}
           >
@@ -260,6 +262,7 @@ const Banner: React.FC = () => {
         width="400px"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        // initialValues={currentRow}
         onFinish={async (value) => {
           const hide = message.loading('处理中。。。');
 
@@ -297,6 +300,13 @@ const Banner: React.FC = () => {
             accept: '.png, .jpg, .jpeg',
             maxCount: 1,
           }}
+          valuePropName={'image'}
+          getValueFromEvent={e => {
+            if (Array.isArray(e)) {
+              return e;
+            }
+            return e && e.image;
+          }}
           // initialValue={[currentItem?.url]}
         />
         <ProFormDateTimePicker
@@ -306,7 +316,7 @@ const Banner: React.FC = () => {
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
           fieldProps={{format: 'YY/MM/DD hh:mm:ss'}}
-          // initialValue={new Date(currentItem?.publishTime)}
+          initialValue={dayjs('2024/09/03 19:34:42')}
         />
         <ProFormText
           label={'跳转路由'}
