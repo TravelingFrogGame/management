@@ -9,6 +9,7 @@ export interface AssetType {
   maxLevel: number;
   name: string;
   nft: boolean;
+  image: string;
 }
 
 export async function list(

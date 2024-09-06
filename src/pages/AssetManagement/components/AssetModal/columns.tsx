@@ -1,7 +1,11 @@
 import {ProColumns} from "@ant-design/pro-components";
 import {AssetType} from "@/services/ant-design-pro/assetApi";
 import dayjs from "dayjs";
+import {Button} from "antd";
 
+function renderUnknown() {
+  return <Button danger type={'link'}>缺失字段</Button>
+}
 
 export const postcardColumns = [
   {
@@ -21,8 +25,10 @@ export const postcardColumns = [
   },
   {
     title: '掉落概率',
+    // todo
     dataIndex: 'description',
     search: false,
+    render: renderUnknown
   },
 ];
 
@@ -40,6 +46,8 @@ export const frogColumns = [
     // todo
     dataIndex: 'level',
     search: false,
+    render: renderUnknown
+
   },{
     title: '升级花费（¥）',
     dataIndex: 'levelUpCny',
@@ -65,11 +73,15 @@ export const frogColumns = [
     // todo
     dataIndex: 'level',
     search: false,
+    render: renderUnknown
+
   },{
     title: '可否转赠',
     // todo
     dataIndex: 'level',
     search: false,
+    render: renderUnknown
+
   }
 ];
 
@@ -87,6 +99,8 @@ export const courtyardColumns = [
     // todo
     dataIndex: 'level',
     search: false,
+    render: renderUnknown
+
   },{
     title: '升级花费（¥）',
     dataIndex: 'levelUpCny',
@@ -108,11 +122,15 @@ export const courtyardColumns = [
     // todo
     dataIndex: 'level',
     search: false,
+    render: renderUnknown
+
   },{
     title: '可否转赠',
     // todo
     dataIndex: 'level',
     search: false,
+    render: renderUnknown
+
   }
 ];
 
@@ -143,6 +161,8 @@ export const toolColumns = [
     // todo
     dataIndex: 'level',
     search: false,
+    render: renderUnknown
+
   }
 ];
 
@@ -161,6 +181,8 @@ export const foodColumns = [
     // todo
     dataIndex: 'level',
     search: false,
+    render: renderUnknown
+
   },{
     title: '描述',
     dataIndex: 'description',
@@ -182,6 +204,8 @@ export const thingColumns = [
     // todo
     dataIndex: 'level',
     search: false,
+    render: renderUnknown
+
   },{
     title: '描述',
     dataIndex: 'description',
@@ -201,15 +225,16 @@ export const specialtyColumns = [
   }, {
     title: '掉落地区',
     // todo
-    // dataIndex: 'description',
+    dataIndex: 'description',
     search: false,
+    render: renderUnknown
+
 
   }
 ];
 
 
 export function getColumnType(type: number) {
-  console.log(type)
   switch (type) {
     case 4:
       return postcardColumns;

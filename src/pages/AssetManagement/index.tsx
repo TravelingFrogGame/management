@@ -1,7 +1,7 @@
 import useFuncListDataProxy from '@/hooks/useFuncListDataProxy';
 import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import React, { useRef } from 'react';
-import {Button} from "antd";
+import {Button, Image} from "antd";
 import * as assetApi from '@/services/ant-design-pro/assetApi'
 import {AssetType} from "@/services/ant-design-pro/assetApi";
 import {useAssetModal} from "./components/AssetModal/index";
@@ -15,7 +15,7 @@ const Invite: React.FC = () => {
     }
   });
 
-  const actionRef = useRef<ActionType>();
+  const actionRef = useRef<AssetType>();
 
   const AssetModal = useAssetModal();
 
@@ -32,6 +32,9 @@ const Invite: React.FC = () => {
       title: '图片',
       dataIndex: 'image',
       search: false,
+      render(_, item) {
+        return <Image src={item.image}/>
+      }
     },
     {
       title: '是否NFT',
