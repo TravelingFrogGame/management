@@ -114,7 +114,7 @@ const Banner: React.FC = () => {
       title: '图片',
       dataIndex: 'image',
       render: (dom, entity, index, action, schema) => {
-        return <Image src={entity.image}/>
+        return <Image src={entity.image} height={50}/>
       }
     } as ProColumns<BannerItem>
   }

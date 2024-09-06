@@ -33,7 +33,7 @@ const Invite: React.FC = () => {
       dataIndex: 'image',
       search: false,
       render(_, item) {
-        return <Image src={item.image}/>
+        return <Image src={item.image} height={30}/>
       }
     },
     {

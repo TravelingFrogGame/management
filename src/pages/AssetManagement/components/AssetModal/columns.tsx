@@ -130,7 +130,6 @@ export const courtyardColumns = [
     dataIndex: 'level',
     search: false,
     render: renderUnknown
-
   }
 ];
 
