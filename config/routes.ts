@@ -12,6 +12,10 @@
  */
 export default [
   {
+    path: '/',
+    redirect: '/invite',
+  },
+  {
     path: '/user',
     layout: false,
     routes: [

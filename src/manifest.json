@@ -1,6 +1,6 @@
 {
-  "name": "旅行青蛙管理系统",
-  "short_name": "旅行青蛙管理系统",
+  "name": "呱呱奇遇管理系统",
+  "short_name": "呱呱奇遇管理系统",
   "display": "standalone",
   "start_url": "./?utm_source=homescreen",
   "theme_color": "#002140",
