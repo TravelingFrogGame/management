@@ -285,6 +285,7 @@ const VersionList: React.FC = () => {
         width="400px"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        // initialValues={currentRow}
         onFinish={async (value) => {
           console.log(`需要发布的版本 : ${JSON.stringify(value)}`)
           const {url,version} = value;
@@ -363,6 +364,7 @@ const VersionList: React.FC = () => {
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
           fieldProps={{format: 'YY/MM/DD hh:mm:ss'}}
+          valuePropName={'publishTime'}
           // initialValue={currentRow?.publishTime ?? currentRow?.createTime}
         />
         <ProFormTextArea
