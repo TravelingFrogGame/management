@@ -94,6 +94,7 @@ export const errorConfig: {
     (config: RequestOptions) => {
       // 拦截请求配置，进行个性化处理。
       config.headers['gtoken'] = TokenUtils.getToken();
+
       return config;
     },
   ],
@@ -103,6 +104,8 @@ export const errorConfig: {
     (response) => {
       // 拦截响应数据，进行个性化处理
       const { data } = response as unknown as ResponseStructure;
+      // const isDev = process.env.NODE_ENV === 'development';
+
 
       if (data?.success === false) {
         message.error('请求失败！');

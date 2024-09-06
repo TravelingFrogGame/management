@@ -14,7 +14,7 @@ export async function currentUser(options?: { [key: string]: any }):Promise<Resu
   // }
   return request<{
     data: API.CurrentUser;
-  }>('/gm/info/info', {
+  }>('/api/gm/info/info', {
     method: 'GET',
     ...(options || {}),
   });
@@ -22,7 +22,7 @@ export async function currentUser(options?: { [key: string]: any }):Promise<Resu
 
 /** 登录接口 POST /api/login/account */
 export async function login(body: { password: any; account: string | undefined }, options?: { [p: string]: any }): Promise<ResultType<{gToken: string}>> {
-  return request('/gm/info/login', {
+  return request('/api/gm/info/login', {
     method: 'POST',
     data: body,
     ...(options || {}),

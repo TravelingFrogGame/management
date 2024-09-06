@@ -12,9 +12,9 @@
 export default {
   // 如果需要自定义本地开发服务器  请取消注释按需调整
   dev: {
-    '/gm/': {
+    '/api/': {
       // 要代理的地址
-      target: 'http://dev.qingwariji.com/api',
+      target: 'http://dev.qingwariji.com',
       changeOrigin: true,
     },
   },

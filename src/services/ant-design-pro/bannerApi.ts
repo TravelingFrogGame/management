@@ -15,7 +15,7 @@ export interface BannerItem {
 export async function bannerList(
   options?: { [p: string]: any },
 ): Promise<Paging<BannerItem>> {
-  return request('/gm/banner/list', {
+  return request('/api/gm/banner/list', {
     method: 'GET',
     ...(options || {}),
   });
@@ -25,7 +25,7 @@ export async function bannerAdd(
   body: BannerItem,
   options?: { [p: string]: any },
 ): Promise<ResultType<{ gToken: string }>> {
-  return request('/gm/banner/add', {
+  return request('/api/gm/banner/add', {
     method: 'POST',
     data: body,
     ...(options || {}),
@@ -36,7 +36,7 @@ export async function bannerClose(
   body: { id: number},
   options?: { [p: string]: any },
 ): Promise<ResultType<{ gToken: string }>> {
-  return request('/gm/banner/close', {
+  return request('/api/gm/banner/close', {
     method: 'POST',
     data: body,
     ...(options || {}),
@@ -47,7 +47,7 @@ export async function bannerUpdate(
   body: BannerItem,
   options?: { [p: string]: any },
 ): Promise<ResultType<{ gToken: string }>> {
-  return request('/gm/banner/update', {
+  return request('/api/gm/banner/update', {
     method: 'POST',
     data: body,
     ...(options || {}),

@@ -15,7 +15,7 @@ export async function list(
   body: { password: any; account: string | undefined },
   options?: { [p: string]: any },
 ): Promise<ResultType<Paging<InviteType>>> {
-  return request('/gm/invite/list', {
+  return request('/api/gm/invite/list', {
     method: 'POST',
     data: body,
     ...(options || {}),
@@ -25,7 +25,7 @@ export async function close(
   body: { id: number },
   options?: { [p: string]: any },
 ): Promise<ResultType<Paging<InviteType>>> {
-  return request('/gm/invite/close', {
+  return request('/api/gm/invite/close', {
     method: 'POST',
     data: body,
     ...(options || {}),
@@ -35,7 +35,7 @@ export async function csv(
   body: any,
   options?: { [p: string]: any },
 ): Promise<ResultType<Paging<InviteType>>> {
-  return request('/gm/invite/csv', {
+  return request('/api/gm/invite/csv', {
     method: 'GET',
     params: body,
     ...(options || {}),

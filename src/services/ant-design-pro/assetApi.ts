@@ -16,7 +16,7 @@ export async function list(
   body: { password: any; account: string | undefined },
   options?: { [p: string]: any },
 ): Promise<ResultType<Paging<AssetType>>> {
-  return request('/gm/asset/list', {
+  return request('/api/gm/asset/list', {
     method: 'GET',
     params: body,
     ...(options || {}),
@@ -26,7 +26,7 @@ export async function configList(
   body: { id: number },
   options?: { [p: string]: any },
 ): Promise<ResultType<Paging<AssetType>>> {
-  return request('/gm/asset/configList', {
+  return request('/api/gm/asset/configList', {
     method: 'GET',
     params: body,
     ...(options || {}),
