@@ -5,6 +5,8 @@ import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
 import {add, AnnouncementType, update} from "@/services/ant-design-pro/announcementApi";
 import {DataUtils} from "@/utils/DataUtils";
 import getCommonTime = DataUtils.getCommonTime;
+import dayjs from "dayjs";
+import CommonTimeFormatter = DataUtils.CommonTimeFormatter;
 
 interface ModalNodeProps {
   closeModal(): () => void;
@@ -132,8 +134,8 @@ function ModalNode(props: ModalNodeProps) {
           placeholder={'请选择发布时间'}
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
-          fieldProps={{format: 'YY/MM/DD hh:mm:ss'}}
-          // initialValue={new Date(currentItem?.publishTime)}
+          fieldProps={{format: CommonTimeFormatter}}
+          initialValue={dayjs(currentItem?.publishTime)}
         />
         <ProFormTextArea
           label={'备注'}

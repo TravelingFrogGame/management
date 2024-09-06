@@ -20,6 +20,9 @@ import useFuncListDataProxy from "@/hooks/useFuncListDataProxy";
 import * as versionApi from '@/services/ant-design-pro/versionApi';
 import {ReleaseStatus} from "@/services/ant-design-pro/enum";
 import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
+import dayjs from "dayjs";
+import {DataUtils} from "@/utils/DataUtils";
+import CommonTimeFormatter = DataUtils.CommonTimeFormatter;
 
 const VersionList: React.FC = () => {
   const versionData = useFuncListDataProxy(versionApi.versionList, {execution: true});
@@ -363,9 +366,9 @@ const VersionList: React.FC = () => {
           placeholder={'请选择发布时间'}
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
-          fieldProps={{format: 'YY/MM/DD hh:mm:ss'}}
+          fieldProps={{format: CommonTimeFormatter}}
           valuePropName={'publishTime'}
-          // initialValue={currentRow?.publishTime ?? currentRow?.createTime}
+          initialValue={dayjs(currentRow?.publishTime)}
         />
         <ProFormTextArea
           label={'更新内容'}

@@ -22,6 +22,7 @@ import {bannerAdd, bannerClose, BannerItem, bannerList, bannerUpdate} from "@/se
 import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
 import {DataUtils} from "@/utils/DataUtils";
 import dayjs from "dayjs";
+import CommonTimeFormatter = DataUtils.CommonTimeFormatter;
 
 const Banner: React.FC = () => {
   const bannerData = useFuncListDataProxy(bannerList, {execution: true});
@@ -300,13 +301,13 @@ const Banner: React.FC = () => {
             accept: '.png, .jpg, .jpeg',
             maxCount: 1,
           }}
-          valuePropName={'image'}
-          getValueFromEvent={e => {
-            if (Array.isArray(e)) {
-              return e;
-            }
-            return e && e.image;
-          }}
+          // valuePropName={'image'}
+          // getValueFromEvent={e => {
+          //   if (Array.isArray(e)) {
+          //     return e;
+          //   }
+          //   return e && e.image;
+          // }}
           // initialValue={[currentItem?.url]}
         />
         <ProFormDateTimePicker
@@ -315,8 +316,8 @@ const Banner: React.FC = () => {
           placeholder={'请选择发布时间'}
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
-          fieldProps={{format: 'YY/MM/DD hh:mm:ss'}}
-          initialValue={dayjs('2024/09/03 19:34:42')}
+          fieldProps={{format: CommonTimeFormatter}}
+          initialValue={dayjs(currentRow?.publishTime)}
         />
         <ProFormText
           label={'跳转路由'}
