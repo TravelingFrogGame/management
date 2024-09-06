@@ -77,7 +77,7 @@ const Invite: React.FC = () => {
   async function exportCVS() {
     const queryParameters = bannerData.getQueryParameters();
     if (queryParameters.phone) {
-      window.open(`/gm/invite/csv?phone=${queryParameters.phone}&pageSize=${queryParameters.pageSize}&page=${queryParameters.page}`)
+      window.open(`/api/gm/invite/csv?phone=${queryParameters.phone}&pageSize=${queryParameters.pageSize}&page=${queryParameters.page}`)
     }
 
   }
