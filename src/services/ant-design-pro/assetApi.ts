@@ -12,6 +12,13 @@ export interface AssetType {
   image: string;
 }
 
+export interface AssetConfigCombo {
+  assetId: number;
+  id: number;
+  level: number;
+  name: string;
+}
+
 export async function list(
   body: { password: any; account: string | undefined },
   options?: { [p: string]: any },
@@ -29,6 +36,17 @@ export async function configList(
   return request('/api/gm/asset/configList', {
     method: 'GET',
     params: body,
+    ...(options || {}),
+  });
+}
+export async function assetConfigComboBox(
+  body: { assetId: number, type: number },
+  options?: { [p: string]: any },
+): Promise<ResultType<Paging<AssetConfigCombo>>> {
+  console.log(body, '===')
+  return request('/api/gm/asset/assetConfigComboBox', {
+    method: 'POST',
+    data: body,
     ...(options || {}),
   });
 }

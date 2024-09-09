@@ -41,11 +41,6 @@ export default [
     path: '/banner',
     component: './Banner',
   },
-  // {
-  //   name: '资产上架',
-  //   path: '/assets',
-  //   component: './Assets',
-  // },
   {
     name: '资产管理',
     path: '/assetManagement',
@@ -55,6 +50,21 @@ export default [
     name: '版本热更',
     path: '/version',
     component: './Version',
+  },
+  {
+    name: '市场管理',
+    path: '/marketManagement',
+    component: './MarketManagement',
+  },
+  {
+    name: '三叶草商城管理',
+    path: '/shopManagement',
+    component: './ShopManagement',
+  },
+  {
+    name: '抽奖管理',
+    path: '/lotteryManagement',
+    component: './LotteryManagement',
   },
   {
     path: '*',
