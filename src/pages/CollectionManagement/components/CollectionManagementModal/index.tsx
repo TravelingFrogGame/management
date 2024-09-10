@@ -7,10 +7,9 @@ import {AssetConfigCombo} from "@/services/ant-design-pro/assetApi";
 import * as assetApi from "@/services/ant-design-pro/assetApi";
 import useModalController from "@/hooks/useModalController";
 import useFuncDataProxy from "@/hooks/useFuncDataProxy";
-import {CurrencyUtils} from "@/utils/CurrencyUtils";
 import * as lotteryApi from "@/services/ant-design-pro/lotteryApi";
-import {LotteryType} from "@/services/ant-design-pro/lotteryApi";
-import * as shopApi from "@/services/ant-design-pro/shopApi";
+import {CurrencyUtils} from "@/utils/CurrencyUtils";
+import {ProFormDatePicker} from "@ant-design/pro-form/lib";
 
 interface ModalNodeProps<T> {
   closeModal: () => void;
@@ -20,7 +19,7 @@ interface ModalNodeProps<T> {
   initData: T;
 }
 
-export function useLotteryManagementModal<T = any>(callback?: () => void) {
+export function useCollectionManagementModal<T = any>(callback?: () => void) {
 
   const {open, openModal, closeModal, data} = useModalController<T>();
 
@@ -46,7 +45,7 @@ export function useLotteryManagementModal<T = any>(callback?: () => void) {
 function ModalNode<T>(props: ModalNodeProps<T>) {
   const { closeModal, open, assetList: _assetList } = props;
 
-  const initData = props.initData as LotteryType;
+  const initData = props.initData as HotShopAddType;
   const title = initData ? '编辑' : '新增';
   const [form] = Form.useForm();
 
@@ -147,7 +146,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
         }
       >
         <ProFormSelect
-          label={'物品名称'}
+          label={'藏品名称'}
           disabled={!!initData}
           rules={[
             {
@@ -160,15 +159,51 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
           placeholder={'请输入标题'}
         />
         <ProFormText
-          label={'中将概率'}
+          label={'价格（￥）'}
           rules={[
             {
               required: true,
-              message: '中将概率不能为空',
+              message: '价格不能为空',
             },
           ]}
           name="probability"
-          placeholder={'请输入中将概率'}
+          placeholder={'请输入价格'}
+        />
+        <ProFormSelect
+          label={'交易货币'}
+          rules={[
+            {
+              required: true,
+              message: '交易货币不能为空',
+            },
+          ]}
+          options={CurrencyUtils.currencyList}
+          name="buyAssetId"
+          placeholder={'请输入内容'}
+        />
+        <ProFormDatePicker
+          label={'首发开始时间'}
+          rules={[
+            {
+              required: true,
+              message: '首发开始时间为空',
+            },
+          ]}
+          options={CurrencyUtils.currencyList}
+          name="buyAssetId"
+          placeholder={'请选择首发开始时间'}
+        />
+        <ProFormDatePicker
+          label={'首发结束时间'}
+          rules={[
+            {
+              required: true,
+              message: '首发结束时间不能为空',
+            },
+          ]}
+          options={CurrencyUtils.currencyList}
+          name="buyAssetId"
+          placeholder={'请选择首发结束时间'}
         />
       </Form>
     </Drawer>

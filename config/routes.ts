@@ -67,6 +67,11 @@ export default [
     component: './LotteryManagement',
   },
   {
+    name: '藏品管理',
+    path: '/collectionManagement',
+    component: './CollectionManagement',
+  },
+  {
     path: '*',
     layout: false,
     component: './404',

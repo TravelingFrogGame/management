@@ -1,31 +1,37 @@
-import {Button, Drawer, Form, Space} from 'antd';
-import React, {useMemo, useState} from 'react';
+import {Button, Drawer, Form, message, Space} from 'antd';
+import React, {useMemo} from 'react';
 import {
   ProFormSelect,
 } from "@ant-design/pro-components";
 import {AssetConfigCombo} from "@/services/ant-design-pro/assetApi";
 import * as assetApi from "@/services/ant-design-pro/assetApi";
+import * as marketApi from "@/services/ant-design-pro/marketApi";
 import useFuncDataProxy from "@/hooks/useFuncDataProxy";
+import useModalController from "@/hooks/useModalController";
+import {MarketType} from "@/services/ant-design-pro/marketApi";
 
-interface ModalNodeProps {
-  closeModal(): () => void;
+interface ModalNodeProps<T> {
+  closeModal: () => void;
+  callback?: () => void;
   open: boolean;
   assetList: AssetConfigCombo[];
+  data?: T | undefined;
 }
 
 const currencyList = [
   {
-    value: 1,
+    value: 2,
     label: '三叶草',
   },
   {
-    value: 2,
+    value: 3,
     label: '种子',
   }
 ];
 
-export function useMarketManagementModal(callback?: () => void) {
-  const [open, setOpen] = useState(false);
+export function useMarketManagementModal<T = any>(callback?: () => void) {
+
+  const {open, openModal, closeModal, data} = useModalController<T>();
 
   const AssetData = useFuncDataProxy<AssetConfigCombo[]>(assetApi.assetConfigComboBox, {
     queryParameters: {
@@ -34,27 +40,22 @@ export function useMarketManagementModal(callback?: () => void) {
     }
   });
 
-
-  function closeModal() {
-    setOpen(false);
-  }
-  function openModal() {
-    setOpen(true);
-  }
-
-  console.log(AssetData, 'AssetData.data===')
+  const openNode = useMemo(() => {
+    return open && AssetData.init;
+  }, [open, AssetData.init])
 
   return {
-    node: AssetData.init && <ModalNode open={open} assetList={AssetData.data!} closeModal={closeModal} />,
+    node: openNode && <ModalNode<T> callback={callback} open={open} assetList={AssetData.data!} closeModal={closeModal} data={data}/>,
     openModal,
   };
 }
 
-function ModalNode(props: ModalNodeProps) {
+function ModalNode<T = any>(props: ModalNodeProps<T>) {
   const { closeModal, open, assetList: _assetList } = props;
 
-  const [form] = Form.useForm();
+  const initData = props.data as MarketType;
 
+  const [form] = Form.useForm();
 
   const assetList = useMemo(() => {
     return _assetList.map((item) => {
@@ -69,18 +70,32 @@ function ModalNode(props: ModalNodeProps) {
   async function confirm() {
     const fieldsValues = await form.validateFields();
 
+    const asset = assetList.find((item) => {
+      return item.id === fieldsValues.sellAssetId;
+    })
+
     const parameterData = {
-      sellAssetId: fieldsValues.sellAssetId,
-      sellAssetConfigId: 3,
+      sellAssetId: asset?.assetId,
+      sellAssetConfigId: asset?.id!,
       buyAssetId: fieldsValues.buyAssetId,
+      id: initData ? initData.id : 0,
     }
 
-    console.log(parameterData, 'parameterData===')
+    const marketApiResult = await (initData ? marketApi.update : marketApi.add)(parameterData);
+    if (marketApiResult.error) {
+      message.error(marketApiResult.msg);
+      return;
+    }
+    props.callback && props.callback();
+    message.success('操作成功');
+    closeModal();
   }
+
+  const title = initData ? '编辑' : '新增';
 
   return (
     <Drawer
-      title="新增"
+      title={title}
       width={500}
       open={open}
       onClose={closeModal}
@@ -95,6 +110,7 @@ function ModalNode(props: ModalNodeProps) {
     >
       <Form
         form={form}
+        initialValues={initData}
         onFinish={async (value) => {}}
       >
         <ProFormSelect
@@ -125,3 +141,5 @@ function ModalNode(props: ModalNodeProps) {
     </Drawer>
   );
 }
+
+

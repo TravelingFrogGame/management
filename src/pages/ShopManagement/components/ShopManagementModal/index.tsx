@@ -1,79 +1,140 @@
-import {Button, Drawer, Form, Space} from 'antd';
+import {Button, Drawer, Form, message, Space} from 'antd';
 import React, {useMemo, useState} from 'react';
 import {
   ProFormSelect, ProFormText,
 } from "@ant-design/pro-components";
-import useFuncListDataProxy from "@/hooks/useFuncListDataProxy";
-import {AssetType} from "@/services/ant-design-pro/assetApi";
 import * as assetApi from "@/services/ant-design-pro/assetApi";
+import * as shopApi from "@/services/ant-design-pro/shopApi";
+import useModalController from "@/hooks/useModalController";
+import {ShopConf, ShopType} from "@/services/ant-design-pro/shopApi";
+import useFuncDataProxy from "@/hooks/useFuncDataProxy";
+import {AssetConfigCombo} from "@/services/ant-design-pro/assetApi";
 
-interface ModalNodeProps {
-  closeModal(): () => void;
+interface ModalNodeProps<T> {
+  closeModal: () => void;
+  callback?: () => void;
   open: boolean;
-  assetList: AssetType[];
+  assetList: AssetConfigCombo[];
+  data?: T | undefined;
 }
 
 const currencyList = [
   {
-    value: 1,
+    value: 2,
     label: '三叶草',
   },
   {
-    value: 2,
+    value: 3,
     label: '种子',
   }
 ];
 
-export function useShopManagementModal(callback?: () => void) {
-  const [open, setOpen] = useState(false);
+export function useShopManagementModal<T = any>(callback?: () => void) {
+  const {open, openModal, closeModal, data} = useModalController<T>();
 
-  const AssetData = useFuncListDataProxy<AssetType>(assetApi.list, {
-    execution: true,
+  const AssetData = useFuncDataProxy<AssetConfigCombo[]>(assetApi.assetConfigComboBox, {
     queryParameters: {
       assetId: 0,
-      type: 3
+      type: 1
     }
   });
 
+  const openNode = useMemo(() => {
+    return open && AssetData.init;
+  }, [open, AssetData.init])
 
-  function closeModal() {
-    setOpen(false);
-  }
-  function openModal() {
-    setOpen(true);
-  }
 
   return {
-    node: AssetData.init && <ModalNode open={open} assetList={AssetData.data} closeModal={closeModal} />,
+    node: openNode && <ModalNode<T> open={open} assetList={AssetData.data!} closeModal={closeModal} data={data}  callback={callback}/>,
     openModal,
   };
 }
 
-function ModalNode(props: ModalNodeProps) {
+function ModalNode<T>(props: ModalNodeProps<T>) {
   const { closeModal, open, assetList: _assetList } = props;
+  const initData = props.data as ShopType;
 
   const [form] = Form.useForm();
 
-
   const assetList = useMemo(() => {
+    if (initData) {
+      return [
+        {
+          value: initData.shopId,
+          label: initData.name,
+        }
+      ]
+    }
+
     return _assetList.map((item) => {
       return {
-        value: item.id,
+        value: `${item.id}-${item.assetId}`,
         label: item.name,
+        ...item,
       }
     })
-  }, [_assetList]);
+  }, [_assetList, initData]);
+
+  const title = initData ? '编辑' : '新增';
+
+  async function confirm() {
+    const fieldsValues = await form.validateFields();
+
+    const assetConfigId = fieldsValues.assetConfigId;
+
+    const id = Number(assetConfigId.split('-')[0]);
+    const assetId = Number(assetConfigId.split('-')[1]);
+
+    const asset = assetList.find((item) => {
+      return item.id === id && item.assetId === assetId;
+    });
+
+    const parameterData = {
+      assetId: asset?.assetId,
+      assetConfigId: asset?.id,
+      originPrice: fieldsValues.originPrice,
+      costPriceType: fieldsValues?.costPriceType,
+    }
+    const marketApiResult = await shopApi.shopAdd(parameterData);
+
+    if (marketApiResult.error) {
+      message.error(marketApiResult.msg);
+      return;
+    }
+    props.callback && props.callback();
+    message.success('操作成功');
+    closeModal();
+  }
+
+  async function confirmUpdate() {
+    const fieldsValues = await form.validateFields();
+
+    const parameterData = {
+      shopId: initData.shopId,
+      originPrice: fieldsValues.originPrice,
+      costPriceType: fieldsValues?.costPriceType,
+    }
+    const marketApiResult = await  shopApi.shopUpdate(parameterData);
+
+    if (marketApiResult.error) {
+      message.error('操作失败');
+      return;
+    }
+    props.callback && props.callback();
+    message.success('操作成功');
+    closeModal();
+  }
 
   return (
     <Drawer
-      title="新增"
+      title={title}
       width={500}
       open={open}
       onClose={closeModal}
       extra={
         <Space>
           <Button onClick={closeModal}>取消</Button>
-          <Button type="primary" onClick={closeModal}>
+          <Button type="primary" onClick={initData ? confirmUpdate : confirm}>
             确定
           </Button>
         </Space>
@@ -81,10 +142,15 @@ function ModalNode(props: ModalNodeProps) {
     >
       <Form
         form={form}
-        onFinish={async (value) => {}}
+        initialValues={ initData && {
+          assetConfigId: initData.shopId,
+          originPrice: initData.originPrice,
+          costPriceType: initData.costPriceType,
+        }}
       >
         <ProFormSelect
           label={'物品名称'}
+          disabled={!!initData}
           rules={[
             {
               required: true,
@@ -104,7 +170,7 @@ function ModalNode(props: ModalNodeProps) {
             },
           ]}
           options={assetList}
-          name="assetConfigId"
+          name="originPrice"
           placeholder={'请输入价格'}
         />
         <ProFormSelect
@@ -116,7 +182,7 @@ function ModalNode(props: ModalNodeProps) {
             },
           ]}
           options={currencyList}
-          name="probability"
+          name="costPriceType"
           placeholder={'请输入内容'}
         />
       </Form>
