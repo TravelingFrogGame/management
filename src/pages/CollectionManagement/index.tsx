@@ -5,19 +5,13 @@ import {Button, message, Popconfirm} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import * as hotShopListApi from "@/services/ant-design-pro/hotShopListApi";
 import {HotShopAddType} from "@/services/ant-design-pro/hotShopListApi";
-import useFuncDataProxy from "@/hooks/useFuncDataProxy";
 import {useCollectionManagementModal} from "@/pages/CollectionManagement/components/CollectionManagementModal";
 
 const Invite: React.FC = () => {
-  // const DataProxy = useFuncListDataProxy<HotShopAddType>(hotShopListApi.list, {
-  //   execution: true,
-  //   queryParameters: {}
-  // });
-
-  const DataProxy = useFuncDataProxy<HotShopAddType>(hotShopListApi.list, {
+  const DataProxy = useFuncListDataProxy<HotShopAddType>(hotShopListApi.list, {
+    execution: true,
+    queryParameters: {}
   });
-
-
   function refresh() {
     DataProxy.refresh();
   }
@@ -50,11 +44,6 @@ const Invite: React.FC = () => {
       search: false,
     },
     {
-      title: '交易货币',
-      dataIndex: 'probability',
-      search: false,
-    },
-    {
       title: '首发开发时间',
       dataIndex: 'startTime',
       search: false,
@@ -67,14 +56,20 @@ const Invite: React.FC = () => {
     },
     {
 
-      title: '状态',
-      dataIndex: 'probability',
+      title: '限售',
+      dataIndex: 'maxSupply',
+      search: false,
+    },
+    {
+
+      title: '库存',
+      dataIndex: 'maxSupply2',
       search: false,
     },
     {
 
       title: '上架人',
-      dataIndex: 'probability',
+      dataIndex: 'creatorName',
       search: false,
     },
     {

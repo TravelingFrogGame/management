@@ -106,9 +106,14 @@ export const errorConfig: {
       const { data } = response as unknown as ResponseStructure;
       // const isDev = process.env.NODE_ENV === 'development';
 
+      // if (data?.success === false) {
+      //   message.error('请求失败！');
+      // }
 
-      if (data?.success === false) {
-        message.error('请求失败！');
+      response.data.success = true;
+
+      if (response.data.code !== 1) {
+        response.data.error = true;
       }
       return response;
     },

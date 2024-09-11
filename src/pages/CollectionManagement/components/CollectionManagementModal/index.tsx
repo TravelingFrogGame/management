@@ -1,15 +1,21 @@
 import {Button, Drawer, Form, message, Space} from 'antd';
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {
-  ProFormSelect, ProFormText,
+  ProFormSelect, ProFormText, ProFormUploadButton,
 } from "@ant-design/pro-components";
 import {AssetConfigCombo} from "@/services/ant-design-pro/assetApi";
 import * as assetApi from "@/services/ant-design-pro/assetApi";
 import useModalController from "@/hooks/useModalController";
 import useFuncDataProxy from "@/hooks/useFuncDataProxy";
-import * as lotteryApi from "@/services/ant-design-pro/lotteryApi";
 import {CurrencyUtils} from "@/utils/CurrencyUtils";
 import {ProFormDatePicker} from "@ant-design/pro-form/lib";
+import {HotShopAddType} from "@/services/ant-design-pro/hotShopListApi";
+import * as hotShopListApi from "@/services/ant-design-pro/hotShopListApi";
+import {DataUtils} from "@/utils/DataUtils";
+import {UploadFile} from "antd/lib";
+import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
+import dayjs, {Dayjs} from "dayjs";
+export const AllFormat = 'YYYY/MM/DD HH:mm:ss';
 
 interface ModalNodeProps<T> {
   closeModal: () => void;
@@ -27,14 +33,13 @@ export function useCollectionManagementModal<T = any>(callback?: () => void) {
   const AssetData = useFuncDataProxy<AssetConfigCombo[]>(assetApi.assetConfigComboBox, {
     queryParameters: {
       assetId: 0,
-      type: 4
+      type: 2
     }
   });
 
   const openNode = useMemo(() => {
     return open && AssetData.init;
   }, [open, AssetData.init])
-
 
   return {
     node: openNode && <ModalNode<T> open={open} assetList={AssetData.data!} closeModal={closeModal} callback={callback!} initData={data!}/>,
@@ -45,20 +50,25 @@ export function useCollectionManagementModal<T = any>(callback?: () => void) {
 function ModalNode<T>(props: ModalNodeProps<T>) {
   const { closeModal, open, assetList: _assetList } = props;
 
+  const {upload} = useAliOSSUploader();
+
   const initData = props.initData as HotShopAddType;
   const title = initData ? '编辑' : '新增';
   const [form] = Form.useForm();
 
+  const [fileList, setFileList] = useState<UploadFile[] | undefined>(() => {
+    if (DataUtils.isUndefined(initData)) {
+      return [];
+    }
+    return [{uid: '-1', name: 't.png', status: 'done', url: initData.detailsUrl}]
+  });
 
   const assetList = useMemo(() => {
-
-    console.log(initData, 'initData===')
     if (initData) {
       return [
         {
           value: initData.id,
           label: initData.name,
-
         }
       ]
     }
@@ -84,16 +94,24 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
       return item.assetId === assetId && item.id === id;
     });
 
+    const imageUrl = await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets);
+
     const parameterData = {
       assetId: asset?.assetId,
       assetConfigId: asset?.id!,
-      probability: fieldsValues.probability,
+      price: Number(fieldsValues.price),
+      maxSupply: Number(fieldsValues.maxSupply),
+      startTime: fieldsValues.startTime.format(AllFormat),
+      endTime: fieldsValues.endTime.format(AllFormat),
+      detail: imageUrl,
     }
-    const apiResult = await lotteryApi.add(parameterData);
+    const apiResult = await hotShopListApi.add(parameterData);
+
     if (apiResult.error) {
       message.error(apiResult.msg);
       return;
     }
+
     props.callback && props.callback();
     message.success('操作成功');
     closeModal();
@@ -102,15 +120,19 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
   async function confirmUpdate() {
     const fieldsValues = await form.validateFields();
 
+    const imageUrl = fieldsValues.detail[0].originFileObj ?  await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets) : fieldsValues.detail[0].url;
+
     const parameterData = {
       id: initData.id,
-      probability: fieldsValues.probability,
+      price: Number(fieldsValues.price),
+      maxSupply: Number(fieldsValues.maxSupply),
+      maxSupply2: Number(fieldsValues.maxSupply2),
+      startTime: fieldsValues.startTime.format(AllFormat),
+      endTime: fieldsValues.endTime.format(AllFormat),
+      detailsUrl: imageUrl,
     }
+    const marketApiResult = await hotShopListApi.update(parameterData);
 
-
-
-    const marketApiResult = await  lotteryApi.update(parameterData);
-    //
     if (marketApiResult.error) {
       message.error(marketApiResult.msg);
       return;
@@ -141,7 +163,13 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
         initialValues={
           initData && {
             assetId: initData.id,
-            probability: initData.probability.split("/")[0]
+            price: initData.price,
+            startTime: dayjs(initData.startTime),
+            endTime: dayjs(initData.endTime),
+            // endTime: initData.endTime,
+            maxSupply: initData.maxSupply,
+            maxSupply2: initData.maxSupply2,
+            detail: fileList ? fileList : [0],
           }
         }
       >
@@ -166,20 +194,8 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
               message: '价格不能为空',
             },
           ]}
-          name="probability"
+          name="price"
           placeholder={'请输入价格'}
-        />
-        <ProFormSelect
-          label={'交易货币'}
-          rules={[
-            {
-              required: true,
-              message: '交易货币不能为空',
-            },
-          ]}
-          options={CurrencyUtils.currencyList}
-          name="buyAssetId"
-          placeholder={'请输入内容'}
         />
         <ProFormDatePicker
           label={'首发开始时间'}
@@ -190,7 +206,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
             },
           ]}
           options={CurrencyUtils.currencyList}
-          name="buyAssetId"
+          name="startTime"
           placeholder={'请选择首发开始时间'}
         />
         <ProFormDatePicker
@@ -202,8 +218,53 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
             },
           ]}
           options={CurrencyUtils.currencyList}
-          name="buyAssetId"
+          name="endTime"
           placeholder={'请选择首发结束时间'}
+        />
+        <ProFormText
+          label={'限售'}
+          rules={[
+            {
+              required: true,
+              message: '限售不能为空',
+            },
+          ]}
+          name="maxSupply"
+          placeholder={'请输入限售'}
+        />
+        {
+          initData && (
+            <ProFormText
+              label={'库存'}
+              rules={[
+                {
+                  required: true,
+                  message: '库存不能为空',
+                },
+              ]}
+              name="maxSupply2"
+              placeholder={'请输入库存'}
+            />
+          )
+        }
+        <ProFormUploadButton
+          label={'选择图片'}
+          name={'detail'}
+          rules={[{required: true, message: '图片不能为空'}]}
+          fieldProps={{
+            listType: 'picture-card',
+            accept: '.png, .jpg, .jpeg',
+            maxCount: 1,
+            fileList,
+          }}
+          onChange={(info) => {
+            setFileList(info.fileList.map(obj => {
+              return {
+                ...obj,
+                status: 'done'
+              }
+            }));
+          }}
         />
       </Form>
     </Drawer>

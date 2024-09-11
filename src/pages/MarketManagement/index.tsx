@@ -57,10 +57,13 @@ const Invite: React.FC = () => {
       title: '操作',
       search: false,
       render(d_, item) {
+        if (item.id === 1 || item.id === 2) {
+          return "-"
+        }
+
         return (
           <>
             <Button size={'small'} type={'link'} onClick={() => {open(item)}}>编辑</Button>
-
             <Popconfirm
               placement="topLeft"
               title={'确认删除吗'}
