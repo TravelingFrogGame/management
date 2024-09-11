@@ -305,11 +305,13 @@ const VersionList: React.FC = () => {
         onFinish={async (value) => {
           console.log(`需要发布的版本 : ${JSON.stringify(value)}`)
           const {url,version} = value;
+          let zipUrl = ''
           if (Number(url[0].uid ) === -1) {
-            handleModalOpen(false);
-            return;
+            zipUrl = url[0].url
+          }else {
+            zipUrl = await upload(url[0].name, url[0].originFileObj, UploadFileType.Version, version) as string;
           }
-          const zipUrl = await upload(url[0].name, url[0].originFileObj, UploadFileType.Version, version);
+
           const newValue = {...value, url: zipUrl};
           let operation;
           let params;
