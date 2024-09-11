@@ -72,6 +72,11 @@ export default [
     component: './CollectionManagement',
   },
   {
+    name: '合成管理',
+    path: '/synthesisManagement',
+    component: './SynthesisManagement',
+  },
+  {
     path: '*',
     layout: false,
     component: './404',
