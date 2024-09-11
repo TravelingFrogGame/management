@@ -53,7 +53,6 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
 
   const assetList = useMemo(() => {
 
-    console.log(initData, 'initData===')
     if (initData) {
       return [
         {
@@ -148,6 +147,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
       >
         <ProFormSelect
           label={'物品名称'}
+          showSearch
           disabled={!!initData}
           rules={[
             {

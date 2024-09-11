@@ -9,6 +9,7 @@ import useModalController from "@/hooks/useModalController";
 import {ShopConf, ShopType} from "@/services/ant-design-pro/shopApi";
 import useFuncDataProxy from "@/hooks/useFuncDataProxy";
 import {AssetConfigCombo} from "@/services/ant-design-pro/assetApi";
+import {CurrencyUtils, shopCurrencyList} from "@/utils/CurrencyUtils";
 
 interface ModalNodeProps<T> {
   closeModal: () => void;
@@ -151,6 +152,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
         <ProFormSelect
           label={'物品名称'}
           disabled={!!initData}
+          showSearch
           rules={[
             {
               required: true,
@@ -175,13 +177,14 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
         />
         <ProFormSelect
           label={'交易货币'}
+          showSearch
           rules={[
             {
               required: true,
               message: '交易货币不能为空',
             },
           ]}
-          options={currencyList}
+          options={CurrencyUtils.shopCurrencyList}
           name="costPriceType"
           placeholder={'请输入内容'}
         />

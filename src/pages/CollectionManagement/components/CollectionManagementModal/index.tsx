@@ -175,6 +175,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
       >
         <ProFormSelect
           label={'藏品名称'}
+          showSearch
           disabled={!!initData}
           rules={[
             {
@@ -207,9 +208,11 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
           ]}
           options={CurrencyUtils.currencyList}
           name="startTime"
+          showTime
           placeholder={'请选择首发开始时间'}
         />
         <ProFormDatePicker
+          showTime
           label={'首发结束时间'}
           rules={[
             {

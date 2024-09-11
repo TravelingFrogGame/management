@@ -39,6 +39,11 @@ const Invite: React.FC = () => {
       search: false,
     },
     {
+      title: '等级',
+      dataIndex: 'level',
+      search: false,
+    },
+    {
       title: '价格（¥）',
       dataIndex: 'price',
       search: false,

@@ -22,14 +22,7 @@ export const postcardColumns = [
     title: '掉落地区',
     dataIndex: 'description',
     search: false,
-  },
-  {
-    title: '掉落概率',
-    // todo
-    dataIndex: 'description',
-    search: false,
-    render: renderUnknown
-  },
+  }
 ];
 
 export const frogColumns = [

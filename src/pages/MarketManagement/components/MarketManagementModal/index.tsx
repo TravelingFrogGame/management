@@ -60,7 +60,8 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
   const assetList = useMemo(() => {
     return _assetList.map((item) => {
       return {
-        value: item.id,
+        // value: item.id,
+        value: `${item.id}-${item.assetId}`,
         label: item.name,
         ...item,
       }
@@ -70,8 +71,13 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
   async function confirm() {
     const fieldsValues = await form.validateFields();
 
+    const sellAssetId = fieldsValues.sellAssetId;
+
+    const id = Number(sellAssetId.split('-')[0]);
+    const assetId = Number(sellAssetId.split('-')[1]);
+
     const asset = assetList.find((item) => {
-      return item.id === fieldsValues.sellAssetId;
+      return item.id === id && item.assetId === assetId;
     })
 
     const parameterData = {
@@ -110,10 +116,14 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
     >
       <Form
         form={form}
-        initialValues={initData}
+        initialValues={initData && {
+          ...initData,
+          sellAssetId: `${initData.id}-${initData.sellAssetId}`
+        }}
         onFinish={async (value) => {}}
       >
         <ProFormSelect
+          showSearch
           label={'物品名称'}
           rules={[
             {
@@ -127,6 +137,7 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
         />
         <ProFormSelect
           label={'交易货币'}
+          showSearch
           rules={[
             {
               required: true,
