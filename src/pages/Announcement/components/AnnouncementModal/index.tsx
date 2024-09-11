@@ -80,12 +80,13 @@ function ModalNode(props: ModalNodeProps) {
           const hide = message.loading('处理中。。。');
           console.log(`公告处理数据 : ${JSON.stringify(value)}`);
           const {url} = value;
+          let imageUrl = ''
           if (url && url.hasOwnProperty('content')) {
-            hide();
-            _close();
-            return;
+            imageUrl = url.url;
+          }else {
+            imageUrl = await upload(url[0].name, url[0].originFileObj, UploadFileType.Announcement) as string;
           }
-          const imageUrl = await upload(url[0].name, url[0].originFileObj, UploadFileType.Announcement);
+
           const newValue = {...value, url: imageUrl,publishTime: DataUtils.getCommonTime(value.publishTime)};
 
           let action;

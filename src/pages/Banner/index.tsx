@@ -277,12 +277,13 @@ const Banner: React.FC = () => {
           const hide = message.loading('处理中。。。');
           console.log(`banner 处理数据 : ${JSON.stringify(value)}`);
           const {image} = value;
+          let imageUrl = ''
           if (Number(image[0].uid ) === -1) {
-            hide();
-            handleModalOpen(false);
-            return;
+            imageUrl = image[0].url;
+          }else {
+            imageUrl = await upload(image[0].name, image[0].originFileObj, UploadFileType.Banner) as string;
           }
-          const imageUrl = await upload(image[0].name, image[0].originFileObj, UploadFileType.Banner);
+
           const newValue = {...value, image: imageUrl};
 
           let operation;
