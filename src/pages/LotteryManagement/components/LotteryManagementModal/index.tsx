@@ -65,7 +65,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
 
     return _assetList.map((item) => {
       return {
-        value: `${item.id}-${item.assetId}`,
+        value: `${item.assetConfigId}-${item.assetId}`,
         label: item.name,
         ...item
       }
@@ -75,18 +75,18 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
   async function confirm() {
     const fieldsValues = await form.validateFields();
 
-    const assetIdText = fieldsValues.assetId;
+    const keyId = fieldsValues.assetId;
 
-    const id = Number(assetIdText.split('-')[0]);
-    const assetId = Number(assetIdText.split('-')[1]);
+    const assetConfigId = Number(keyId.split('-')[0]);
+    const assetId = Number(keyId.split('-')[1]);
 
     const asset = assetList.find((item) => {
-      return item.assetId === assetId && item.id === id;
+      return item.assetId === assetId && item.assetConfigId === assetConfigId;
     });
 
     const parameterData = {
       assetId: asset?.assetId,
-      assetConfigId: asset?.id!,
+      assetConfigId: asset?.assetConfigId!,
       probability: fieldsValues.probability,
     }
     const apiResult = await lotteryApi.add(parameterData);

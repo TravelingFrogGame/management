@@ -69,7 +69,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
 
     return _assetList.map((item) => {
       return {
-        value: `${item.id}-${item.assetId}`,
+        value: `${item.assetConfigId}-${item.assetId}`,
         label: item.name,
         ...item,
       }
@@ -81,18 +81,18 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
   async function confirm() {
     const fieldsValues = await form.validateFields();
 
-    const assetConfigId = fieldsValues.assetConfigId;
+    const keyId = fieldsValues.assetConfigId;
 
-    const id = Number(assetConfigId.split('-')[0]);
-    const assetId = Number(assetConfigId.split('-')[1]);
+    const assetConfigId = Number(keyId.split('-')[0]);
+    const assetId = Number(keyId.split('-')[1]);
 
     const asset = assetList.find((item) => {
-      return item.id === id && item.assetId === assetId;
+      return item.assetConfigId === assetConfigId && item.assetId === assetId;
     });
 
     const parameterData = {
       assetId: asset?.assetId,
-      assetConfigId: asset?.id,
+      assetConfigId: asset?.assetConfigId,
       originPrice: fieldsValues.originPrice,
       costPriceType: fieldsValues?.costPriceType,
     }

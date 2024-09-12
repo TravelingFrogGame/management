@@ -14,7 +14,7 @@ export interface AssetType {
 
 export interface AssetConfigCombo {
   assetId: number;
-  id: number;
+  assetConfigId: number;
   level: number;
   name: string;
 }

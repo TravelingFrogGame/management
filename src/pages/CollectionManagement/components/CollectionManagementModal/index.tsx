@@ -75,7 +75,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
 
     return _assetList.map((item) => {
       return {
-        value: `${item.id}-${item.assetId}`,
+        value: `${item.assetConfigId}-${item.assetId}`,
         label: item.name,
         ...item
       }
@@ -87,18 +87,18 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
 
     const assetIdText = fieldsValues.assetId;
 
-    const id = Number(assetIdText.split('-')[0]);
+    const assetConfigId = Number(assetIdText.split('-')[0]);
     const assetId = Number(assetIdText.split('-')[1]);
 
     const asset = assetList.find((item) => {
-      return item.assetId === assetId && item.id === id;
+      return item.assetId === assetId && item.assetConfigId === assetConfigId;
     });
 
     const imageUrl = await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets);
 
     const parameterData = {
       assetId: asset?.assetId,
-      assetConfigId: asset?.id!,
+      assetConfigId: asset?.assetConfigId!,
       price: Number(fieldsValues.price),
       maxSupply: Number(fieldsValues.maxSupply),
       startTime: fieldsValues.startTime.format(AllFormat),

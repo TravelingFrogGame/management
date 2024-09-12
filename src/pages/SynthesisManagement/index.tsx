@@ -112,3 +112,5 @@ const SynthesisManagement: React.FC = () => {
 };
 
 export default SynthesisManagement;
+
+
