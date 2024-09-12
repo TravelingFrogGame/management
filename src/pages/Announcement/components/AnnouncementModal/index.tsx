@@ -41,10 +41,8 @@ function ModalNode(props: ModalNodeProps) {
   form.resetFields();
   const {upload} = useAliOSSUploader();
 
-  const [initItem, setInitItem] = useState<AnnouncementType | undefined>(currentItem);
   const [fileList, setFileList] = useState<UploadFile[] | undefined>([]);
   useEffect(() => {
-    setInitItem(currentItem);
 
     if (!DataUtils.isUndefined(currentItem)) {
       setFileList([{uid: '-1', name: 'test.png', status: 'done', url: currentItem?.url}])
@@ -55,8 +53,6 @@ function ModalNode(props: ModalNodeProps) {
   const _close = () => {
     closeModal()?.();
   }
-
-  console.log(`fileList : ${JSON.stringify(fileList)}`)
 
   return (
     <Drawer
@@ -76,15 +72,16 @@ function ModalNode(props: ModalNodeProps) {
     >
       <Form
         form={form}
+        initialValues={{...currentItem, url: currentItem && [{uid: '-1', name: 'test.png', status: 'done', url: currentItem?.url}]}}
         onFinish={async (value) => {
           const hide = message.loading('处理中。。。');
-          console.log(`公告处理数据 : ${JSON.stringify(value)}`);
           const {url} = value;
+          console.log(`公告处理数据 : ${JSON.stringify(url)}`);
           let imageUrl = ''
-          if (url && url.hasOwnProperty('content')) {
-            imageUrl = url.url;
-          }else {
+          if (url[0].hasOwnProperty('originFileObj')) {
             imageUrl = await upload(url[0].name, url[0].originFileObj, UploadFileType.Announcement) as string;
+          }else {
+            imageUrl = url[0].url;
           }
 
           const newValue = {...value, url: imageUrl,publishTime: DataUtils.getCommonTime(value.publishTime)};
@@ -134,7 +131,6 @@ function ModalNode(props: ModalNodeProps) {
           width="md"
           name="content"
           placeholder={'请输入内容'}
-          initialValue={currentItem?.content ?? ''}
         />
         <ProFormUploadButton
           label={'选择图片'}
@@ -145,16 +141,6 @@ function ModalNode(props: ModalNodeProps) {
             accept: '.png, .jpg, .jpeg',
             maxCount: 1,
           }}
-          fileList={DataUtils.isUndefined(currentItem) ? undefined : fileList}
-          initialValue={currentItem}
-          onChange={(info) => {
-            setFileList(info.fileList.map(obj => {
-              return {
-                ...obj,
-                status: 'done'
-              }
-            }));
-          }}
         />
         <ProFormDateTimePicker
           label={'发布时间'}
@@ -163,14 +149,12 @@ function ModalNode(props: ModalNodeProps) {
           name={'publishTime'}
           rules={[{required: true, message: '发布时间不能为空'}]}
           fieldProps={{format: CommonTimeFormatter}}
-          initialValue={currentItem?.publishTime}
         />
         <ProFormTextArea
           label={'备注'}
           placeholder={'备注(非必填)'}
           width="md"
           name="remark"
-          initialValue={currentItem?.remark ?? ''}
         />
       </Form>
     </Drawer>
