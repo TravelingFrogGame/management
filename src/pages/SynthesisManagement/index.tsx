@@ -6,6 +6,7 @@ import {PlusOutlined} from "@ant-design/icons";
 import * as synthesisListApi from "@/services/ant-design-pro/synthesisListApi";
 import {useSynthesisManagementModal} from "@/pages/SynthesisManagement/components/SynthesisManagementModal";
 import {SynthesisType} from "@/services/ant-design-pro/synthesisListApi";
+import {CurrencyUtils} from "@/utils/CurrencyUtils";
 
 const SynthesisManagement: React.FC = () => {
   const DataProxy = useFuncListDataProxy<SynthesisType>(synthesisListApi.list, {
@@ -44,18 +45,26 @@ const SynthesisManagement: React.FC = () => {
       dataIndex: 'typeName',
       search: false,
     },
-    {
-      title: '图片',
-      dataIndex: 'image',
-      search: false,
-      render(_, item) {
-        return <Image src={item.image} height={30}/>
-      }
-    },
+    // {
+    //   title: '图片',
+    //   dataIndex: 'image',
+    //   search: false,
+    //   render(_, item) {
+    //     return <Image src={item.image} height={30}/>
+    //   }
+    // },
     {
       title: '价格',
       dataIndex: 'originPrice',
       search: false,
+    },
+    {
+      title: '交易货币',
+      dataIndex: 'costPriceType',
+      search: false,
+      render(_, item) {
+        return CurrencyUtils.getCurrency(item.costPriceType)?.label;
+      }
     },
     {
       title: '操作',
@@ -97,14 +106,6 @@ const SynthesisManagement: React.FC = () => {
         }}
         rowKey="key"
         columns={columns}
-        toolBarRender={() => [
-          <Button type="primary" key="primary" onClick={() => {
-            LotteryManagementModal.openModal();
-          }}>
-            <PlusOutlined />
-            新增
-          </Button>,
-        ]}
         dataSource={DataProxy.data} />
       {LotteryManagementModal.node}
     </PageContainer>

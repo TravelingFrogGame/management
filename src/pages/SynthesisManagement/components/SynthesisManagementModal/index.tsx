@@ -1,14 +1,17 @@
 import {Button, Drawer, Form, message, Space} from 'antd';
 import React, {useMemo, useState} from 'react';
 import {
-  ProFormSelect, ProFormText,
+  ProFormSelect, ProFormText, ProFormUploadButton,
 } from "@ant-design/pro-components";
 import {AssetConfigCombo} from "@/services/ant-design-pro/assetApi";
 import * as assetApi from "@/services/ant-design-pro/assetApi";
 import useModalController from "@/hooks/useModalController";
 import useFuncDataProxy from "@/hooks/useFuncDataProxy";
-import * as lotteryApi from "@/services/ant-design-pro/lotteryApi";
-import {LotteryType} from "@/services/ant-design-pro/lotteryApi";
+import * as synthesisListApi from "@/services/ant-design-pro/synthesisListApi";
+import {SynthesisType} from "@/services/ant-design-pro/synthesisListApi";
+import {UploadFile} from "antd/lib";
+import {DataUtils} from "@/utils/DataUtils";
+import {CurrencyUtils} from "@/utils/CurrencyUtils";
 
 interface ModalNodeProps<T> {
   closeModal: () => void;
@@ -26,7 +29,7 @@ export function useSynthesisManagementModal<T = any>(callback?: () => void) {
   const AssetData = useFuncDataProxy<AssetConfigCombo[]>(assetApi.assetConfigComboBox, {
     queryParameters: {
       assetId: 0,
-      type: 4
+      type: 1
     }
   });
 
@@ -44,70 +47,36 @@ export function useSynthesisManagementModal<T = any>(callback?: () => void) {
 function ModalNode<T>(props: ModalNodeProps<T>) {
   const { closeModal, open, assetList: _assetList } = props;
 
-  const initData = props.initData as LotteryType;
+  const initData = props.initData as SynthesisType;
   const title = initData ? '编辑' : '新增';
   const [form] = Form.useForm();
-
+  const [fileList, setFileList] = useState<UploadFile[] | undefined>(() => {
+    if (DataUtils.isUndefined(initData)) {
+      return [];
+    }
+    return [{uid: '-1', name: 't.png', status: 'done', url: initData.detailsUrl}]
+  });
 
   const assetList = useMemo(() => {
-
-    if (initData) {
-      return [
-        {
-          value: initData.id,
-          label: initData.name,
-
-        }
-      ]
-    }
-
-    return _assetList.map((item) => {
-      return {
-        value: `${item.id}-${item.assetId}`,
-        label: item.name,
-        ...item
+    return [
+      {
+        value: initData.shopId,
+        label: initData.name,
       }
-    })
+    ]
   }, [_assetList, initData]);
 
-  async function confirm() {
-    const fieldsValues = await form.validateFields();
-
-    const assetIdText = fieldsValues.assetId;
-
-    const id = Number(assetIdText.split('-')[0]);
-    const assetId = Number(assetIdText.split('-')[1]);
-
-    const asset = assetList.find((item) => {
-      return item.assetId === assetId && item.id === id;
-    });
-
-    const parameterData = {
-      assetId: asset?.assetId,
-      assetConfigId: asset?.id!,
-      probability: fieldsValues.probability,
-    }
-    const apiResult = await lotteryApi.add(parameterData);
-    if (apiResult.error) {
-      message.error(apiResult.msg);
-      return;
-    }
-    props.callback && props.callback();
-    message.success('操作成功');
-    closeModal();
-  }
 
   async function confirmUpdate() {
     const fieldsValues = await form.validateFields();
 
     const parameterData = {
-      id: initData.id,
-      probability: fieldsValues.probability,
+      shopId: initData.shopId,
+      originPrice: fieldsValues.originPrice,
+      costPriceType: fieldsValues?.costPriceType,
     }
 
-
-
-    const marketApiResult = await  lotteryApi.update(parameterData);
+    const marketApiResult = await  synthesisListApi.update(parameterData);
     //
     if (marketApiResult.error) {
       message.error(marketApiResult.msg);
@@ -118,7 +87,6 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
     closeModal();
   }
 
-
   return (
     <Drawer
       title={title}
@@ -128,7 +96,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
       extra={
         <Space>
           <Button onClick={closeModal}>取消</Button>
-          <Button type="primary" onClick={initData ? confirmUpdate : confirm}>
+          <Button type="primary" onClick={confirmUpdate}>
             确定
           </Button>
         </Space>
@@ -136,17 +104,16 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
     >
       <Form
         form={form}
-        initialValues={
-          initData && {
-            assetId: initData.id,
-            probability: initData.probability.split("/")[0]
-          }
-        }
+        initialValues={ initData && {
+          assetConfigId: initData.shopId,
+          originPrice: initData.originPrice,
+          costPriceType: initData.costPriceType,
+        }}
       >
         <ProFormSelect
           label={'物品名称'}
-          showSearch
           disabled={!!initData}
+          showSearch
           rules={[
             {
               required: true,
@@ -154,19 +121,33 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
             },
           ]}
           options={assetList}
-          name="assetId"
+          name="assetConfigId"
           placeholder={'请输入标题'}
         />
         <ProFormText
-          label={'中将概率'}
+          label={'价格（￥）'}
           rules={[
             {
               required: true,
-              message: '中将概率不能为空',
+              message: '价格不能为空',
             },
           ]}
-          name="probability"
-          placeholder={'请输入中将概率'}
+          options={assetList}
+          name="originPrice"
+          placeholder={'请输入价格'}
+        />
+        <ProFormSelect
+          label={'交易货币'}
+          showSearch
+          rules={[
+            {
+              required: true,
+              message: '交易货币不能为空',
+            },
+          ]}
+          options={CurrencyUtils.shopCurrencyList}
+          name="costPriceType"
+          placeholder={'请输入内容'}
         />
       </Form>
     </Drawer>

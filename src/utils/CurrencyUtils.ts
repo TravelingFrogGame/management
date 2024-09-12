@@ -28,7 +28,7 @@ export namespace CurrencyUtils {
   ];
 
   export function getCurrency(type: number) {
-    return currencyList.find((item) => {
+    return shopCurrencyList.find((item) => {
       return item.value === type;
     })
   }

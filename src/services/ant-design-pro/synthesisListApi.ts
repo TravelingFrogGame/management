@@ -40,7 +40,7 @@ export async function update(
   body: any,
   options?: { [p: string]: any },
 ): Promise<ResultType<Paging<SynthesisType>>> {
-  return request('/api/gm/shop/hotShopUpdate', {
+  return request('/api/gm/shop/shopUpdate', {
     method: 'POST',
     data: body,
     ...(options || {}),

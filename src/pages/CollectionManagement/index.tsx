@@ -1,7 +1,7 @@
 import useFuncListDataProxy from '@/hooks/useFuncListDataProxy';
 import { PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import React, { useRef } from 'react';
-import {Button, message, Popconfirm} from "antd";
+import {Button, Image, message, Popconfirm} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import * as hotShopListApi from "@/services/ant-design-pro/hotShopListApi";
 import {HotShopAddType} from "@/services/ant-design-pro/hotShopListApi";
@@ -42,6 +42,14 @@ const Invite: React.FC = () => {
       title: '等级',
       dataIndex: 'level',
       search: false,
+    },
+    {
+      title: '图片',
+      dataIndex: 'image',
+      search: false,
+      render(_, item) {
+        return <Image src={item.detailsUrl} height={30}/>
+      }
     },
     {
       title: '价格（¥）',
