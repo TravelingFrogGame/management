@@ -81,7 +81,7 @@ function ModalNode(props: ModalNodeProps) {
           if (url[0].hasOwnProperty('originFileObj')) {
             imageUrl = await upload(url[0].name, url[0].originFileObj, UploadFileType.Announcement) as string;
           }else {
-            imageUrl = url.url;
+            imageUrl = url[0].url;
           }
 
           const newValue = {...value, url: imageUrl,publishTime: DataUtils.getCommonTime(value.publishTime)};
