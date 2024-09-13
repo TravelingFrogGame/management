@@ -29,7 +29,7 @@ export function useSynthesisManagementModal<T = any>(callback?: () => void) {
   const AssetData = useFuncDataProxy<AssetConfigCombo[]>(assetApi.assetConfigComboBox, {
     queryParameters: {
       assetId: 0,
-      type: 1
+      type: 5
     }
   });
 

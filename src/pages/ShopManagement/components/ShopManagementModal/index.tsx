@@ -1,7 +1,7 @@
 import {Button, Drawer, Form, message, Space} from 'antd';
 import React, {useMemo, useState} from 'react';
 import {
-  ProFormSelect, ProFormText,
+  ProFormSelect, ProFormText, ProFormUploadButton,
 } from "@ant-design/pro-components";
 import * as assetApi from "@/services/ant-design-pro/assetApi";
 import * as shopApi from "@/services/ant-design-pro/shopApi";
@@ -10,6 +10,9 @@ import {ShopConf, ShopType} from "@/services/ant-design-pro/shopApi";
 import useFuncDataProxy from "@/hooks/useFuncDataProxy";
 import {AssetConfigCombo} from "@/services/ant-design-pro/assetApi";
 import {CurrencyUtils, shopCurrencyList} from "@/utils/CurrencyUtils";
+import {UploadFile} from "antd/lib";
+import {DataUtils} from "@/utils/DataUtils";
+import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
 
 interface ModalNodeProps<T> {
   closeModal: () => void;
@@ -54,8 +57,16 @@ export function useShopManagementModal<T = any>(callback?: () => void) {
 function ModalNode<T>(props: ModalNodeProps<T>) {
   const { closeModal, open, assetList: _assetList } = props;
   const initData = props.data as ShopType;
-
+  const {upload} = useAliOSSUploader();
   const [form] = Form.useForm();
+
+  const [fileList, setFileList] = useState<UploadFile[] | undefined>(() => {
+    if (DataUtils.isUndefined(initData)) {
+      return [];
+    }
+    return [{uid: '-1', name: 't.png', status: 'done', url: initData.detailsUrl}]
+  });
+
 
   const assetList = useMemo(() => {
     if (initData) {
@@ -90,11 +101,15 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
       return item.assetConfigId === assetConfigId && item.assetId === assetId;
     });
 
+    const imageUrl = await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets);
+
     const parameterData = {
       assetId: asset?.assetId,
       assetConfigId: asset?.assetConfigId,
       originPrice: fieldsValues.originPrice,
       costPriceType: fieldsValues?.costPriceType,
+      detailsUrl: imageUrl,
+
     }
     const marketApiResult = await shopApi.shopAdd(parameterData);
 
@@ -110,10 +125,13 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
   async function confirmUpdate() {
     const fieldsValues = await form.validateFields();
 
+    const imageUrl = fieldsValues.detail[0].originFileObj ?  await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets) : fieldsValues.detail[0].url;
+
     const parameterData = {
       shopId: initData.shopId,
       originPrice: fieldsValues.originPrice,
       costPriceType: fieldsValues?.costPriceType,
+      detailsUrl: imageUrl,
     }
     const marketApiResult = await  shopApi.shopUpdate(parameterData);
 
@@ -147,6 +165,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
           assetConfigId: initData.shopId,
           originPrice: initData.originPrice,
           costPriceType: initData.costPriceType,
+          detail: fileList ? fileList : [0],
         }}
       >
         <ProFormSelect
@@ -187,6 +206,26 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
           options={CurrencyUtils.shopCurrencyList}
           name="costPriceType"
           placeholder={'请输入内容'}
+        />
+
+        <ProFormUploadButton
+          label={'选择图片'}
+          name={'detail'}
+          rules={[{required: true, message: '图片不能为空'}]}
+          fieldProps={{
+            listType: 'picture-card',
+            accept: '.png, .jpg, .jpeg',
+            maxCount: 1,
+            fileList,
+          }}
+          onChange={(info) => {
+            setFileList(info.fileList.map(obj => {
+              return {
+                ...obj,
+                status: 'done'
+              }
+            }));
+          }}
         />
       </Form>
     </Drawer>
