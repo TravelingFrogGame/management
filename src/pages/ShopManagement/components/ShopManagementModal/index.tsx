@@ -9,7 +9,7 @@ import useModalController from "@/hooks/useModalController";
 import {ShopConf, ShopType} from "@/services/ant-design-pro/shopApi";
 import useFuncDataProxy from "@/hooks/useFuncDataProxy";
 import {AssetConfigCombo} from "@/services/ant-design-pro/assetApi";
-import {CurrencyUtils, shopCurrencyList} from "@/utils/CurrencyUtils";
+import {CurrencyUtils} from "@/utils/CurrencyUtils";
 import {UploadFile} from "antd/lib";
 import {DataUtils} from "@/utils/DataUtils";
 import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
@@ -22,16 +22,6 @@ interface ModalNodeProps<T> {
   data?: T | undefined;
 }
 
-const currencyList = [
-  {
-    value: 2,
-    label: '三叶草',
-  },
-  {
-    value: 3,
-    label: '种子',
-  }
-];
 
 export function useShopManagementModal<T = any>(callback?: () => void) {
   const {open, openModal, closeModal, data} = useModalController<T>();

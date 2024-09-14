@@ -2,11 +2,11 @@ import useFuncListDataProxy from '@/hooks/useFuncListDataProxy';
 import { PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import React from 'react';
 import {Button, Image, message, Popconfirm} from "antd";
-import {PlusOutlined} from "@ant-design/icons";
 import * as synthesisListApi from "@/services/ant-design-pro/synthesisListApi";
 import {useSynthesisManagementModal} from "@/pages/SynthesisManagement/components/SynthesisManagementModal";
-import {SynthesisType} from "@/services/ant-design-pro/synthesisListApi";
+import {synthesisDelete, SynthesisType} from "@/services/ant-design-pro/synthesisListApi";
 import {CurrencyUtils} from "@/utils/CurrencyUtils";
+import {PlusOutlined} from "@ant-design/icons";
 
 const SynthesisManagement: React.FC = () => {
   const DataProxy = useFuncListDataProxy<SynthesisType>(synthesisListApi.list, {
@@ -25,7 +25,7 @@ const SynthesisManagement: React.FC = () => {
   }
 
   async function remove(item: SynthesisType) {
-    const removeResult = await synthesisListApi.remove({id: item.id});
+    const removeResult = await synthesisListApi.synthesisDelete({id: item.shopId});
     if (removeResult.error) {
       message.error('删除失败');
       return;
@@ -45,14 +45,14 @@ const SynthesisManagement: React.FC = () => {
       dataIndex: 'typeName',
       search: false,
     },
-    // {
-    //   title: '图片',
-    //   dataIndex: 'image',
-    //   search: false,
-    //   render(_, item) {
-    //     return <Image src={item.image} height={30}/>
-    //   }
-    // },
+    {
+      title: '图片',
+      dataIndex: 'image',
+      search: false,
+      render(_, item) {
+        return <Image src={item.detailsUrl} height={30}/>
+      }
+    },
     {
       title: '价格',
       dataIndex: 'originPrice',
@@ -96,7 +96,9 @@ const SynthesisManagement: React.FC = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer
+
+    >
       <ProTable<SynthesisType, API.PageParams>
         search={false}
         options={{
@@ -106,7 +108,16 @@ const SynthesisManagement: React.FC = () => {
         }}
         rowKey="key"
         columns={columns}
-        dataSource={DataProxy.data} />
+        dataSource={DataProxy.data}
+        toolBarRender={() => [
+          <Button type="primary" key="primary" onClick={() => {
+            LotteryManagementModal.openModal();
+          }}>
+            <PlusOutlined />
+            新增
+          </Button>,
+        ]}
+      />
       {LotteryManagementModal.node}
     </PageContainer>
   );

@@ -8,10 +8,11 @@ import * as assetApi from "@/services/ant-design-pro/assetApi";
 import useModalController from "@/hooks/useModalController";
 import useFuncDataProxy from "@/hooks/useFuncDataProxy";
 import * as synthesisListApi from "@/services/ant-design-pro/synthesisListApi";
-import {SynthesisType} from "@/services/ant-design-pro/synthesisListApi";
+import {synthesisAdd, SynthesisType, synthesisUpdate} from "@/services/ant-design-pro/synthesisListApi";
 import {UploadFile} from "antd/lib";
 import {DataUtils} from "@/utils/DataUtils";
 import {CurrencyUtils} from "@/utils/CurrencyUtils";
+import {UploadFileType, useAliOSSUploader} from "@/hooks/useAliOSSUploader";
 
 interface ModalNodeProps<T> {
   closeModal: () => void;
@@ -46,6 +47,7 @@ export function useSynthesisManagementModal<T = any>(callback?: () => void) {
 
 function ModalNode<T>(props: ModalNodeProps<T>) {
   const { closeModal, open, assetList: _assetList } = props;
+  const {upload} = useAliOSSUploader();
 
   const initData = props.initData as SynthesisType;
   const title = initData ? '编辑' : '新增';
@@ -58,25 +60,69 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
   });
 
   const assetList = useMemo(() => {
-    return [
-      {
-        value: initData.shopId,
-        label: initData.name,
+    if (initData) {
+      return [
+        {
+          value: initData.shopId,
+          label: initData.name,
+        }
+      ]
+    }
+    return _assetList.map((item) => {
+      return {
+        value: `${item.assetConfigId}-${item.assetId}`,
+        label: item.name,
+        ...item,
       }
-    ]
+    })
   }, [_assetList, initData]);
 
 
   async function confirmUpdate() {
     const fieldsValues = await form.validateFields();
+    const imageUrl = fieldsValues.detail[0].originFileObj ?  await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets) : fieldsValues.detail[0].url;
 
     const parameterData = {
       shopId: initData.shopId,
       originPrice: fieldsValues.originPrice,
       costPriceType: fieldsValues?.costPriceType,
+      detailsUrl: imageUrl
     }
 
-    const marketApiResult = await  synthesisListApi.update(parameterData);
+    const marketApiResult = await  synthesisListApi.synthesisUpdate(parameterData);
+
+    if (marketApiResult.error) {
+      message.error(marketApiResult.msg);
+      return;
+    }
+    props.callback && props.callback();
+    message.success('操作成功');
+    closeModal();
+  }
+
+  async function confirm() {
+    const fieldsValues = await form.validateFields();
+
+    const imageUrl = await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets);
+    const keyId = fieldsValues.assetConfigId;
+
+    const assetConfigId = Number(keyId.split('-')[0]);
+    const assetId = Number(keyId.split('-')[1]);
+
+    const asset = assetList.find((item) => {
+      return item.assetConfigId === assetConfigId && item.assetId === assetId;
+    });
+
+
+    const parameterData = {
+      assetId: asset?.assetId,
+      assetConfigId: asset?.assetConfigId,
+      originPrice: Number(fieldsValues.originPrice),
+      costPriceType: fieldsValues?.costPriceType,
+      detailsUrl: imageUrl,
+
+    }
+    const marketApiResult = await  synthesisListApi.synthesisAdd(parameterData);
     //
     if (marketApiResult.error) {
       message.error(marketApiResult.msg);
@@ -87,6 +133,8 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
     closeModal();
   }
 
+
+
   return (
     <Drawer
       title={title}
@@ -96,7 +144,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
       extra={
         <Space>
           <Button onClick={closeModal}>取消</Button>
-          <Button type="primary" onClick={confirmUpdate}>
+          <Button type="primary"  onClick={initData ? confirmUpdate : confirm}>
             确定
           </Button>
         </Space>
@@ -108,6 +156,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
           assetConfigId: initData.shopId,
           originPrice: initData.originPrice,
           costPriceType: initData.costPriceType,
+          detail: fileList ? fileList : [0],
         }}
       >
         <ProFormSelect
@@ -148,6 +197,25 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
           options={CurrencyUtils.shopCurrencyList}
           name="costPriceType"
           placeholder={'请输入内容'}
+        />
+        <ProFormUploadButton
+          label={'选择图片'}
+          name={'detail'}
+          rules={[{required: true, message: '图片不能为空'}]}
+          fieldProps={{
+            listType: 'picture-card',
+            accept: '.png, .jpg, .jpeg',
+            maxCount: 1,
+            fileList,
+          }}
+          onChange={(info) => {
+            setFileList(info.fileList.map(obj => {
+              return {
+                ...obj,
+                status: 'done'
+              }
+            }));
+          }}
         />
       </Form>
     </Drawer>
