@@ -76,6 +76,11 @@ export default [
     path: '/synthesisManagement',
     component: './SynthesisManagement',
   },
+  // {
+  //   name: '日志管理',
+  //   path: '/LogManagement',
+  //   component: './LogManagement',
+  // },
   {
     path: '*',
     layout: false,
