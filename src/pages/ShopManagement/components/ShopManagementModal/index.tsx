@@ -91,14 +91,14 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
       return item.assetConfigId === assetConfigId && item.assetId === assetId;
     });
 
-    const imageUrl = await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets);
+    // const imageUrl = await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets);
 
     const parameterData = {
       assetId: asset?.assetId,
       assetConfigId: asset?.assetConfigId,
       originPrice: fieldsValues.originPrice,
       costPriceType: fieldsValues?.costPriceType,
-      detailsUrl: imageUrl,
+      // detailsUrl: imageUrl,
 
     }
     const marketApiResult = await shopApi.shopAdd(parameterData);
@@ -115,13 +115,13 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
   async function confirmUpdate() {
     const fieldsValues = await form.validateFields();
 
-    const imageUrl = fieldsValues.detail[0].originFileObj ?  await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets) : fieldsValues.detail[0].url;
+    // const imageUrl = fieldsValues.detail[0].originFileObj ?  await upload(fieldsValues.detail[0].name, fieldsValues.detail[0].originFileObj, UploadFileType.Assets) : fieldsValues.detail[0].url;
 
     const parameterData = {
       shopId: initData.shopId,
       originPrice: fieldsValues.originPrice,
       costPriceType: fieldsValues?.costPriceType,
-      detailsUrl: imageUrl,
+      // detailsUrl: imageUrl,
     }
     const marketApiResult = await  shopApi.shopUpdate(parameterData);
 
@@ -198,25 +198,25 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
           placeholder={'请输入内容'}
         />
 
-        <ProFormUploadButton
-          label={'选择图片'}
-          name={'detail'}
-          rules={[{required: true, message: '图片不能为空'}]}
-          fieldProps={{
-            listType: 'picture-card',
-            accept: '.png, .jpg, .jpeg',
-            maxCount: 1,
-            fileList,
-          }}
-          onChange={(info) => {
-            setFileList(info.fileList.map(obj => {
-              return {
-                ...obj,
-                status: 'done'
-              }
-            }));
-          }}
-        />
+        {/*<ProFormUploadButton*/}
+        {/*  label={'选择图片'}*/}
+        {/*  name={'detail'}*/}
+        {/*  rules={[{required: true, message: '图片不能为空'}]}*/}
+        {/*  fieldProps={{*/}
+        {/*    listType: 'picture-card',*/}
+        {/*    accept: '.png, .jpg, .jpeg',*/}
+        {/*    maxCount: 1,*/}
+        {/*    fileList,*/}
+        {/*  }}*/}
+        {/*  onChange={(info) => {*/}
+        {/*    setFileList(info.fileList.map(obj => {*/}
+        {/*      return {*/}
+        {/*        ...obj,*/}
+        {/*        status: 'done'*/}
+        {/*      }*/}
+        {/*    }));*/}
+        {/*  }}*/}
+        {/*/>*/}
       </Form>
     </Drawer>
   );

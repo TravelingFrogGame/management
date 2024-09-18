@@ -27,7 +27,7 @@ const Invite: React.FC = () => {
   async function remove(item: ShopType) {
     const removeResult = await shopApi.remove({id: item.shopId});
     if (removeResult.error) {
-      message.error('删除失败');
+      message.error(removeResult.msg);
       return;
     }
     message.success('删除成功');

@@ -111,13 +111,6 @@ export const toolColumns = [
     dataIndex: 'level',
     search: false,
   },{
-    title: '合成消耗工具碎片',
-    dataIndex: 'formatEffect',
-    search: false,
-    render(_, item) {
-      return item.formatEffect === '1' ? item.formatEffect : '-';
-    }
-  },{
     title: '升级消耗工具碎片',
     dataIndex: 'levelUpPrice',
     search: false,
