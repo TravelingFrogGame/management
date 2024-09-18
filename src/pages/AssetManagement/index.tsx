@@ -52,6 +52,21 @@ const Invite: React.FC = () => {
       },
     },
     {
+      title: '是否可转赠',
+      dataIndex: 'present',
+      search: false,
+      valueEnum: {
+        'true': {
+          text: '是',
+          status: 'Success',
+        },
+        'false': {
+          text: '否',
+          status: 'Error',
+        }
+      },
+    },
+    {
       title: '最大等级',
       dataIndex: 'maxLevel',
       search: false,

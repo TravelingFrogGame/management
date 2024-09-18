@@ -1,6 +1,3 @@
-import {ProColumns} from "@ant-design/pro-components";
-import {AssetType} from "@/services/ant-design-pro/assetApi";
-import dayjs from "dayjs";
 import {Button} from "antd";
 
 function renderUnknown() {
@@ -34,13 +31,6 @@ export const frogColumns = [
     title: '算力',
     dataIndex: 'hashPower',
     search: false,
-  }, {
-    title: '价格（¥）',
-    // todo
-    dataIndex: 'level',
-    search: false,
-    render: renderUnknown
-
   },{
     title: '升级花费（¥）',
     dataIndex: 'levelUpCny',
@@ -49,6 +39,17 @@ export const frogColumns = [
     title: '升级花费币种',
     dataIndex: 'levelUpPriceType',
     search: false,
+    valueEnum: {
+      '2': {
+        text: '三叶草',
+      },
+      '3': {
+        status: '种子',
+      } ,
+      '11': {
+        status: '碎片',
+      }
+    },
   },{
     title: '体力上限',
     dataIndex: 'maxEnergy',
@@ -57,24 +58,6 @@ export const frogColumns = [
     title: '旅行消耗体力',
     dataIndex: 'travelCostEnergy',
     search: false,
-  },{
-    title: '闲置消耗体力',
-    dataIndex: 'formatEffect',
-    search: false,
-  },{
-    title: '特产掉落数量',
-    // todo
-    dataIndex: 'level',
-    search: false,
-    render: renderUnknown
-
-  },{
-    title: '可否转赠',
-    // todo
-    dataIndex: 'level',
-    search: false,
-    render: renderUnknown
-
   }
 ];
 
@@ -87,13 +70,6 @@ export const courtyardColumns = [
     title: '算力',
     dataIndex: 'hashPower',
     search: false,
-  }, {
-    title: '价格（¥）',
-    // todo
-    dataIndex: 'level',
-    search: false,
-    render: renderUnknown
-
   },{
     title: '升级花费（¥）',
     dataIndex: 'levelUpCny',
@@ -102,6 +78,17 @@ export const courtyardColumns = [
     title: '升级花费币种',
     dataIndex: 'levelUpPriceType',
     search: false,
+    valueEnum: {
+      '2': {
+        text: '三叶草',
+      },
+      '3': {
+        status: '种子',
+      } ,
+      '11': {
+        status: '碎片',
+      }
+    },
   },{
     title: '产能上限',
     dataIndex: 'maxEnergy',
@@ -110,19 +97,6 @@ export const courtyardColumns = [
     title: '生产消耗产能',
     dataIndex: 'workCostEnergy',
     search: false,
-  },{
-    title: '产出三叶草数量',
-    // todo
-    dataIndex: 'level',
-    search: false,
-    render: renderUnknown
-
-  },{
-    title: '可否转赠',
-    // todo
-    dataIndex: 'level',
-    search: false,
-    render: renderUnknown
   }
 ];
 
@@ -140,6 +114,9 @@ export const toolColumns = [
     title: '合成消耗工具碎片',
     dataIndex: 'formatEffect',
     search: false,
+    render(_, item) {
+      return item.formatEffect === '1' ? item.formatEffect : '-';
+    }
   },{
     title: '升级消耗工具碎片',
     dataIndex: 'levelUpPrice',
@@ -148,13 +125,6 @@ export const toolColumns = [
     title: '描述',
     dataIndex: 'description',
     search: false,
-  },{
-    title: '可否转赠',
-    // todo
-    dataIndex: 'level',
-    search: false,
-    render: renderUnknown
-
   }
 ];
 
@@ -168,13 +138,6 @@ export const foodColumns = [
     title: '补充体力',
     dataIndex: 'energy',
     search: false,
-  },{
-    title: '价格（¥）',
-    // todo
-    dataIndex: 'level',
-    search: false,
-    render: renderUnknown
-
   },{
     title: '描述',
     dataIndex: 'description',
@@ -192,13 +155,6 @@ export const thingColumns = [
     dataIndex: 'energy',
     search: false,
   },{
-    title: '价格（¥）',
-    // todo
-    dataIndex: 'level',
-    search: false,
-    render: renderUnknown
-
-  },{
     title: '描述',
     dataIndex: 'description',
     search: false,
@@ -214,14 +170,6 @@ export const specialtyColumns = [
     title: '等级',
     dataIndex: 'level',
     search: false,
-  }, {
-    title: '掉落地区',
-    // todo
-    dataIndex: 'description',
-    search: false,
-    render: renderUnknown
-
-
   }
 ];
 
