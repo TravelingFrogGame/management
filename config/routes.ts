@@ -30,56 +30,68 @@ const pageList = [
     name: '用户邀请',
     path: '/invite',
     component: './Invite',
+    access: 'invite'
   },
   {
     name: '公告上架',
     path: '/announcement',
     component: './Announcement',
+    access: 'announcement'
+
   },
   {
     name: 'Banner上架',
     path: '/banner',
     component: './Banner',
+    access: 'banner'
   },
   {
     name: '资产管理',
     path: '/assetManagement',
     component: './AssetManagement',
+    access: 'assetManagement'
   },
   {
     name: '版本热更',
     path: '/version',
     component: './Version',
+    access: 'version'
   },
   {
     name: '市场管理',
     path: '/marketManagement',
     component: './MarketManagement',
+    access: 'marketManagement'
   },
   {
     name: '三叶草商城管理',
     path: '/shopManagement',
     component: './ShopManagement',
+    access: 'shopManagement'
   },
   {
     name: '抽奖管理',
     path: '/lotteryManagement',
     component: './LotteryManagement',
+    access: 'lotteryManagement'
   },
   {
     name: '藏品管理',
     path: '/collectionManagement',
     component: './CollectionManagement',
+    access: 'collectionManagement'
   },
   {
     name: '合成管理',
     path: '/synthesisManagement',
     component: './SynthesisManagement',
+    access: 'synthesisManagement'
   },
   {
     name: '账号管理',
     path: '/accountManagement',
     component: './AccountManagement',
+    access: 'accountManagement'
   },
   {
     path: '*',

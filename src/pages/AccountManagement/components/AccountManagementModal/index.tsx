@@ -58,11 +58,14 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
 
   async function confirmUpdate() {
     const fieldsValues = await form.validateFields();
-
     const parameterData = {
-
+      gmId: initData.gmId,
+      menu: fieldsValues.menu.join(','),
+      remark: fieldsValues.remark,
+      name: fieldsValues.name,
+      ...fieldsValues.password && { password : CryptoUtils.md5Encode(fieldsValues.password) },
     }
-    const marketApiResult = await  userInfoApi.updateMenu(parameterData);
+    const marketApiResult = await  userInfoApi.update(parameterData);
 
     if (marketApiResult.error) {
       message.error('操作失败');
@@ -91,25 +94,31 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
       <Form
         form={form}
         initialValues={ initData && {
-
+          account: initData.account,
+          name: initData.name,
+          menu: (initData.menu || '').split(","),
+          remark: initData.remark,
         }}
       >
-        <ProFormText
-          label={'账号'}
-          rules={[
-            {
-              required: true,
-              message: '账号不能为空',
-            },
-          ]}
-          name="account"
-          placeholder={'请输入账号'}
-        />
+
+        {
+          !initData && <ProFormText
+            label={'账号'}
+            rules={[
+              {
+                required: true,
+                message: '账号不能为空',
+              },
+            ]}
+            name="account"
+            placeholder={'请输入账号'}
+          />
+        }
         <ProFormText
           label={'密码'}
           rules={[
             {
-              required: true,
+              required: !initData,
               message: '密码不能为空',
             },
           ]}
