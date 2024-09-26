@@ -88,6 +88,12 @@ const pageList = [
     access: 'synthesisManagement'
   },
   {
+    name: '机器人管理',
+    path: '/robotManagement',
+    component: './RobotManagement',
+    access: 'robotManagement'
+  },
+  {
     name: '账号管理',
     path: '/accountManagement',
     component: './AccountManagement',
