@@ -91,6 +91,21 @@ const RobotManagement: React.FC = () => {
           <Button type="primary" key="primary" onClick={() => {
             CreateRobotModal.openModal();
           }}>
+            首发购买
+          </Button>,
+          <Button type="primary" key="primary" onClick={() => {
+            CreateRobotModal.openModal();
+          }}>
+            去生产
+          </Button>,
+          <Button type="primary" key="primary" onClick={() => {
+            CreateRobotModal.openModal();
+          }}>
+            去旅行
+          </Button>,
+          <Button type="primary" key="primary" onClick={() => {
+            CreateRobotModal.openModal();
+          }}>
             <PlusOutlined />
             新增机器人
           </Button>,
