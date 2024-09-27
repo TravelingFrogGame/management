@@ -114,18 +114,17 @@ const Login: React.FC = () => {
     try {
       // 登录
       const msg = await login({account: values.username, password: CryptoUtils.md5Encode(values.password!)});
-      if (msg.success) {
-
-        const defaultLoginSuccessMessage = intl.formatMessage({
-          id: 'pages.login.success',
-          defaultMessage: '登录成功！',
-        });
-        message.success(defaultLoginSuccessMessage);
+      if (!msg.error) {
         TokenUtils.setToken(msg.data.gToken);
         await fetchUserInfo();
         history.push('/invite');
         return;
       }
+      const defaultLoginFailureMessage = intl.formatMessage({
+        id: 'pages.login.failure',
+        defaultMessage: '登录失败，请重试！',
+      });
+      message.error(defaultLoginFailureMessage);
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
