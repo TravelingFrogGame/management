@@ -120,11 +120,7 @@ const Login: React.FC = () => {
         history.push('/invite');
         return;
       }
-      const defaultLoginFailureMessage = intl.formatMessage({
-        id: 'pages.login.failure',
-        defaultMessage: '登录失败，请重试！',
-      });
-      message.error(defaultLoginFailureMessage);
+      message.error(msg.msg || '登录失败，请重试！');
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
