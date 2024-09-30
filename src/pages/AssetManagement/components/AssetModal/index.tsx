@@ -22,7 +22,6 @@ export function useAssetModal(callback?: () => void) {
   }
 
   function openModal(asset: AssetType) {
-    // console.log(asset, 'assetasset')
     flushSync(async () => {
       setAsset(asset);
       setOpen(true);
@@ -48,6 +47,7 @@ function ModalNode(props: ModalNodeProps) {
 
   const actionRef = useRef<ActionType>();
 
+  console.log(asset?.id, 'asset?.id==')
   const columns = getColumnType(asset?.id!);
 
   return (

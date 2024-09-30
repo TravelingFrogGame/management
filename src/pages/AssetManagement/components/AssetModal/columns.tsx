@@ -44,10 +44,10 @@ export const frogColumns = [
         text: '三叶草',
       },
       '3': {
-        status: '种子',
+        text: '种子',
       } ,
       '11': {
-        status: '碎片',
+        text: '碎片',
       }
     },
   },{
@@ -83,10 +83,10 @@ export const courtyardColumns = [
         text: '三叶草',
       },
       '3': {
-        status: '种子',
+        text: '种子',
       } ,
       '11': {
-        status: '碎片',
+        text: '碎片',
       }
     },
   },{
