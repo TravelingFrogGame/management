@@ -7,6 +7,7 @@ import {Button, Popconfirm} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import {RobotType} from "@/services/ant-design-pro/robotApi";
 import {useCreateRobotModal} from "@/pages/RobotManagement/components/CreateRobotModal";
+import {useUpgradeFrogModal} from "@/pages/RobotManagement/components/UpgradeFrogModal";
 
 const RobotManagement: React.FC = () => {
   const MarketProxy = useFuncListDataProxy<RobotType>(robotApi.list, {execution: true});
@@ -16,61 +17,84 @@ const RobotManagement: React.FC = () => {
   }
 
   const CreateRobotModal = useCreateRobotModal<RobotType>(refresh);
+  const UpgradeFrogModal = useUpgradeFrogModal<RobotType>(refresh);
 
-  async function open(item: RobotType) {
+  async function createRobot(item: RobotType) {
     CreateRobotModal.openModal(item);
   }
 
-  async function remove(item: RobotType) {
-
+  function upgradeFrog(item: RobotType) {
+    UpgradeFrogModal.openModal(item);
   }
+
+  // {
+  //   "account": "7gicxym3",
+  //   "coin": "0",
+  //   "createTime": "2024/10/10 10:24:56",
+  //   "creatorName": "admin昵称",
+  //   "frog": "",
+  //   "id": 945,
+  //   "name": "用户64758911",
+  //   "production": "生产中(0)空闲(0)",
+  //   "seed": "0",
+  //   "travel": "旅行中(0)空闲(0)"
+  // }
 
   const columns: ProColumns<RobotType>[] = [
     {
-      title: '物品名称',
-      dataIndex: 'sellName',
+      title: '机器人账号',
+      dataIndex: 'account',
+      search: false,
+    },
+    // {
+    //   title: '密码',
+    //   dataIndex: 'sellType',
+    //   search: false,
+    // },
+    {
+      title: '昵称',
+      dataIndex: 'name',
       search: false,
     },
     {
-      title: '分类',
-      dataIndex: 'sellType',
+      title: '青蛙数',
+      dataIndex: 'frog',
       search: false,
     },
     {
-      title: '交易货币',
-      dataIndex: 'buyName',
+      title: '旅行状态',
       search: false,
+      dataIndex: 'travel',
+    },
+    // {
+    //   title: '庭院',
+    //   search: false,
+    //   dataIndex: 'production',
+    // },
+    {
+      title: '生产状态',
+      search: false,
+      dataIndex: 'production',
     },
     {
-      title: '上架人',
-      dataIndex: 'creatorName',
+      title: '三叶草',
       search: false,
+      dataIndex: "coin",
     },
     {
-      title: '操作',
+      title: '种子',
       search: false,
-      render(d_, item) {
-        if (item.id === 1 || item.id === 2) {
-          return "-"
-        }
-
-        return (
-          <>
-            <Button size={'small'} type={'link'} onClick={() => {open(item)}}>编辑</Button>
-            <Popconfirm
-              placement="topLeft"
-              title={'确认删除吗'}
-              onConfirm={() => {
-                remove(item)
-              }}
-            >
-              <Button type={'link'} size={'small'} danger>
-                删除
-              </Button>
-            </Popconfirm>
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                </>
-        );
-      }
+      dataIndex: "seed"
+    },
+    {
+      title: '注册时间',
+      search: false,
+      dataIndex: "createTime",
+    },
+    {
+      title: '创建人',
+      search: false,
+      dataIndex: "creatorName",
     }
   ];
 
@@ -78,6 +102,7 @@ const RobotManagement: React.FC = () => {
   return (
     <PageContainer>
       {CreateRobotModal.node}
+      {UpgradeFrogModal.node}
       <ProTable<InviteType, API.PageParams>
         search={false}
         options={{
@@ -103,9 +128,7 @@ const RobotManagement: React.FC = () => {
           }}>
             去旅行
           </Button>,
-          <Button type="primary" key="primary" onClick={() => {
-            CreateRobotModal.openModal();
-          }}>
+          <Button type="primary" key="primary" onClick={createRobot}>
             <PlusOutlined />
             新增机器人
           </Button>,
@@ -116,3 +139,5 @@ const RobotManagement: React.FC = () => {
 };
 
 export default RobotManagement;
+
+

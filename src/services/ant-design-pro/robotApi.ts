@@ -4,13 +4,16 @@ import { Paging, ResultType } from '@/typing/request';
 import { request } from '@umijs/max';
 
 export interface RobotType {
-  buyAssetId: number;
-  buyName: string;
+  account: string;
+  coin: string;
+  createTime: string;
+  creatorName: string;
+  frog: string;
   id: number;
-  sellAssetConfigId: number;
-  sellAssetId: number;
-  sellName: string;
-  sellType: string;
+  name: string;
+  production: string;
+  seed: string;
+  travel: string;
 }
 
 export async function list(
@@ -30,7 +33,13 @@ export async function create(
 ): Promise<any> {
   return request('/api/gm/robot/create', {
     method: 'POST',
-    body: body,
+    data: body,
     ...(options || {}),
   });
+
+  // return request('/api/gm/robot/create', {
+  //   method: 'POST',
+  //   body: body,
+  //   ...(options || {}),
+  // });
 }

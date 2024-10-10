@@ -1,7 +1,7 @@
 import {Button, Drawer, Form, message, Space} from 'antd';
 import React from 'react';
 import {
-  ProFormDigit,
+  ProFormDigit, ProFormSelect, ProFormText,
 } from "@ant-design/pro-components";
 import useModalController from "@/hooks/useModalController";
 import * as robotApi from '@/services/ant-design-pro/robotApi';
@@ -12,7 +12,22 @@ interface ModalNodeProps<T> {
   open: boolean;
 }
 
-export function useCreateRobotModal<T = any>(callback?: () => void) {
+const lvList = [
+  {
+    value: '1',
+    label: 'Lv1',
+  },
+  {
+    value: '2',
+    label: 'Lv2',
+  },
+  {
+    value: '3',
+    label: 'Lv3',
+  }
+]
+
+export function useUpgradeFrogModal<T = any>(callback?: () => void) {
 
   const {open, openModal, closeModal} = useModalController<T>();
 
@@ -41,7 +56,7 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
 
   return (
     <Drawer
-      title={'新增机器人'}
+      title={'升级青蛙'}
       width={500}
       open={open}
       onClose={closeModal}
@@ -58,19 +73,22 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
         form={form}
         onFinish={async (value) => {}}
       >
-        <ProFormDigit
-          min={1}
-          label={'机器人数量'}
+        <ProFormSelect
+          showSearch
+          label={'将青蛙升级到'}
           rules={[
             {
               required: true,
-              message: '机器人数量不能为空',
+              message: '不能为空',
             },
           ]}
-          name="amount"
-          placeholder={'请输入机器人数量'}
-          initialValue={1}
+          options={lvList}
+          name="sellAssetId"
+          placeholder={'请输入标题'}
         />
+        <div style={{paddingLeft: '20px', fontSize: '12px'}}>
+          提示：该帐号下所有低于Lv2的都将升级到Lv2
+        </div>
       </Form>
     </Drawer>
   );
