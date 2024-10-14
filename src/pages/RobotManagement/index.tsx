@@ -3,11 +3,14 @@ import { InviteType } from '@/services/ant-design-pro/inviteApi';
 import * as robotApi from '@/services/ant-design-pro/robotApi';
 import { PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import React from 'react';
-import {Button, Popconfirm} from "antd";
+import {Button, Flex, Row} from "antd";
 import {PlusOutlined} from "@ant-design/icons";
 import {RobotType} from "@/services/ant-design-pro/robotApi";
 import {useCreateRobotModal} from "@/pages/RobotManagement/components/CreateRobotModal";
 import {useUpgradeFrogModal} from "@/pages/RobotManagement/components/UpgradeFrogModal";
+import {useTravelModal} from "@/pages/RobotManagement/components/TravelModal";
+import {useProductModal} from "@/pages/RobotManagement/components/ProductModal";
+import {useFirstPurchaseModal} from "@/pages/RobotManagement/components/FirstPurchaseModal";
 
 const RobotManagement: React.FC = () => {
   const MarketProxy = useFuncListDataProxy<RobotType>(robotApi.list, {execution: true});
@@ -18,27 +21,26 @@ const RobotManagement: React.FC = () => {
 
   const CreateRobotModal = useCreateRobotModal<RobotType>(refresh);
   const UpgradeFrogModal = useUpgradeFrogModal<RobotType>(refresh);
+  const TravelModal = useTravelModal<RobotType>(refresh);
+  const ProductModal = useProductModal<RobotType>(refresh);
+  const FirstPurchaseModal = useFirstPurchaseModal<RobotType>(refresh);
 
-  async function createRobot(item: RobotType) {
-    CreateRobotModal.openModal(item);
+  async function createRobot() {
+    CreateRobotModal.openModal();
   }
 
   function upgradeFrog(item: RobotType) {
     UpgradeFrogModal.openModal(item);
   }
-
-  // {
-  //   "account": "7gicxym3",
-  //   "coin": "0",
-  //   "createTime": "2024/10/10 10:24:56",
-  //   "creatorName": "admin昵称",
-  //   "frog": "",
-  //   "id": 945,
-  //   "name": "用户64758911",
-  //   "production": "生产中(0)空闲(0)",
-  //   "seed": "0",
-  //   "travel": "旅行中(0)空闲(0)"
-  // }
+  function travel() {
+    TravelModal.openModal();
+  }
+  function product() {
+    ProductModal.openModal();
+  }
+  function firstPurchase() {
+    FirstPurchaseModal.openModal();
+  }
 
   const columns: ProColumns<RobotType>[] = [
     {
@@ -95,7 +97,29 @@ const RobotManagement: React.FC = () => {
       title: '创建人',
       search: false,
       dataIndex: "creatorName",
-    }
+    },
+    // {
+    //   title: '操作',
+    //   search: false,
+    //   dataIndex: "op",
+    //   render(_, item) {
+    //     return (
+    //       <Flex>
+    //         <Button type="primary" key="primary" size={'small'} onClick={() => {
+    //           upgradeFrog(item);
+    //         }}>
+    //           升级青蛙
+    //         </Button>
+    //         <Button key="primary" size={'small'} onClick={() => {
+    //           CreateRobotModal.openModal();
+    //         }}>
+    //           升级庭院
+    //         </Button>
+    //       </Flex>
+    //
+    //     )
+    //   }
+    // }
   ];
 
 
@@ -103,6 +127,9 @@ const RobotManagement: React.FC = () => {
     <PageContainer>
       {CreateRobotModal.node}
       {UpgradeFrogModal.node}
+      {TravelModal.node}
+      {ProductModal.node}
+      {FirstPurchaseModal.node}
       <ProTable<InviteType, API.PageParams>
         search={false}
         options={{
@@ -113,19 +140,13 @@ const RobotManagement: React.FC = () => {
         rowKey="key"
         columns={columns}
         toolBarRender={() => [
-          <Button type="primary" key="primary" onClick={() => {
-            CreateRobotModal.openModal();
-          }}>
-            首发购买
-          </Button>,
-          <Button type="primary" key="primary" onClick={() => {
-            CreateRobotModal.openModal();
-          }}>
+          // <Button type="primary" key="primary" onClick={firstPurchase}>
+          //   首发购买
+          // </Button>,
+          <Button type="primary" key="primary" onClick={product}>
             去生产
           </Button>,
-          <Button type="primary" key="primary" onClick={() => {
-            CreateRobotModal.openModal();
-          }}>
+          <Button type="primary" key="primary" onClick={travel}>
             去旅行
           </Button>,
           <Button type="primary" key="primary" onClick={createRobot}>

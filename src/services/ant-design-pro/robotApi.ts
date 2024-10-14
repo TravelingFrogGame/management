@@ -43,3 +43,34 @@ export async function create(
   //   ...(options || {}),
   // });
 }
+export async function travel(
+  body: any,
+  options?: { [p: string]: any },
+): Promise<any> {
+  return request('/api/gm/robot/travel', {
+    method: 'POST',
+    data: body,
+    ...(options || {}),
+  });
+}
+
+export async function product(
+  body: any,
+  options?: { [p: string]: any },
+): Promise<any> {
+  return request('/api/gm/robot/product', {
+    method: 'POST',
+    data: body,
+    ...(options || {}),
+  });
+}
+
+export async function buyFrogInfo(
+  body: any,
+  options?: { [p: string]: any },
+): Promise<any> {
+  return request('/api/gm/robot/buyFrogInfo', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}

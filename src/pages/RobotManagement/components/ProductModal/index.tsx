@@ -28,7 +28,7 @@ const lvList = [
   }
 ]
 
-export function useUpgradeFrogModal<T = any>(callback?: () => void) {
+export function useProductModal<T = any>(callback?: () => void) {
 
   const {open, openModal, closeModal} = useModalController<T>();
 
@@ -45,21 +45,24 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
 
   async function confirm() {
     const fieldsValues = await form.validateFields();
-    const createResult = await robotApi.create(fieldsValues);
+    const createResult = await robotApi.travel(fieldsValues);
     if (createResult.error) {
       message.error(createResult.msg);
       return;
     }
-    message.success('创建成功');
+    message.success('生产成功');
     closeModal();
     callback && callback();
   }
 
-  // const songValue = Form.useWatch('song',form);
+  const level = Form.useWatch('level',form);
+  const amount = Form.useWatch('amount',form);
+
+  console.log(level, amount)
 
   return (
     <Drawer
-      title={'升级青蛙'}
+      title={'去生产'}
       width={500}
       open={open}
       onClose={closeModal}
@@ -77,8 +80,7 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
         onFinish={async (value) => {}}
       >
         <ProFormSelect
-          showSearch
-          label={'将青蛙升级到'}
+          label={'等级'}
           rules={[
             {
               required: true,
@@ -86,11 +88,22 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
             },
           ]}
           options={lvList}
-          name="lv"
+          name="level"
           placeholder={'请输入标题'}
         />
+        <ProFormText
+          label={'生产数量'}
+          rules={[
+            {
+              required: true,
+              message: '数不能为空',
+            },
+          ]}
+          name="amount"
+          placeholder={'请输入数量'}
+        />
         <div style={{paddingLeft: '20px', fontSize: '12px'}}>
-          提示：该帐号下所有低于Lv2的都将升级到Lv2
+          提示：该帐号下所有低于Lv{level}的都将升级到Lv{level}
         </div>
       </Form>
     </Drawer>
