@@ -65,12 +65,42 @@ export async function product(
   });
 }
 
-export async function buyFrogInfo(
+export async function hotShopList(
+  options?: { [p: string]: any },
+): Promise<any> {
+  return request('/api/gm/robot/hotShopList', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
+export async function frogLevelUp(
   body: any,
   options?: { [p: string]: any },
 ): Promise<any> {
-  return request('/api/gm/robot/buyFrogInfo', {
-    method: 'GET',
+  return request('/api/gm/robot/frogLevelUp', {
+    method: 'POST',
+    data: body,
+    ...(options || {}),
+  });
+}
+export async function courtyardLevelUp(
+  body: any,
+  options?: { [p: string]: any },
+): Promise<any> {
+  return request('/api/gm/robot/courtyardLevelUp', {
+    method: 'POST',
+    data: body,
+    ...(options || {}),
+  });
+}
+export async function buyHotShop(
+  body: any,
+  options?: { [p: string]: any },
+): Promise<any> {
+  return request('/api/gm/robot/buyHotShop', {
+    method: 'POST',
+    data: body,
     ...(options || {}),
   });
 }

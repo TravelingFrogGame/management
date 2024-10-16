@@ -1,11 +1,11 @@
 import {Button, Drawer, Form, message, Space} from 'antd';
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ProFormDigit, ProFormSelect, ProFormText,
 } from "@ant-design/pro-components";
 import useModalController from "@/hooks/useModalController";
 import * as robotApi from '@/services/ant-design-pro/robotApi';
-import {useWatch} from "rc-field-form";
+import {useAsyncEffect} from "ahooks";
 
 interface ModalNodeProps<T> {
   closeModal: () => void;
@@ -13,57 +13,49 @@ interface ModalNodeProps<T> {
   open: boolean;
 }
 
-const lvList = [
-  {
-    value: '1',
-    label: 'Lv1',
-  },
-  {
-    value: '2',
-    label: 'Lv2',
-  },
-  {
-    value: '3',
-    label: 'Lv3',
-  }
-]
-
 export function useFirstPurchaseModal<T = any>(callback?: () => void) {
 
   const {open, openModal, closeModal} = useModalController<T>();
+  const [assetList, setAssetList] = useState();
 
-  useEffect(() => {
-
-    robotApi.buyFrogInfo().then(console.log)
+  useAsyncEffect(async() => {
+    const result = await robotApi.hotShopList();
+    if (result.error) {
+      return;
+    }
+    setAssetList(result.data.map((item) => {
+      return {
+        value: item.id,
+        label: item.product,
+      }
+    }));
   }, []);
 
   return {
-    node: open && <ModalNode<T> callback={callback} open={open} closeModal={closeModal}/>,
+    node: open && <ModalNode<T> callback={callback} open={open} closeModal={closeModal} assetList={assetList}/>,
     openModal,
   };
 }
 
 function ModalNode<T = any>(props: ModalNodeProps<T>) {
-  const { closeModal, open, assetList: _assetList, callback} = props;
+  const { closeModal, open, assetList, callback} = props;
 
   const [form] = Form.useForm();
 
   async function confirm() {
     const fieldsValues = await form.validateFields();
-    const createResult = await robotApi.travel(fieldsValues);
+    const createResult = await robotApi.buyHotShop(fieldsValues);
     if (createResult.error) {
       message.error(createResult.msg);
       return;
     }
-    message.success('旅行成功');
+    message.success('购买成功');
     closeModal();
     callback && callback();
   }
 
-  const level = Form.useWatch('level',form);
+  const person = Form.useWatch('person',form);
   const amount = Form.useWatch('amount',form);
-
-  console.log(level, amount)
 
   return (
     <Drawer
@@ -85,30 +77,41 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
         onFinish={async (value) => {}}
       >
         <ProFormSelect
-          label={'等级'}
+          label={'商品'}
           rules={[
             {
               required: true,
-              message: '不能为空',
+              message: '请选择商品',
             },
           ]}
-          options={lvList}
-          name="level"
-          placeholder={'请输入标题'}
+          options={assetList}
+          name="id"
+          placeholder={'请选择商品'}
         />
         <ProFormText
-          label={'去旅行数量'}
+          label={'购买数量'}
           rules={[
             {
               required: true,
-              message: '数不能为空',
+              message: '数量不能为空',
             },
           ]}
           name="amount"
           placeholder={'请输入数量'}
         />
+        <ProFormText
+          label={'账号数量'}
+          rules={[
+            {
+              required: true,
+              message: '账号数量不能为空',
+            },
+          ]}
+          name="person"
+          placeholder={'请输入账号数量'}
+        />
         <div style={{paddingLeft: '20px', fontSize: '12px'}}>
-          提示：将所有机器人帐号的Lv{level}青蛙选出{amount}只去旅行
+          提示：选出{person}个账号，每个账号买{amount}个
         </div>
       </Form>
     </Drawer>

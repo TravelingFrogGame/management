@@ -5,7 +5,7 @@ import {
 } from "@ant-design/pro-components";
 import useModalController from "@/hooks/useModalController";
 import * as robotApi from '@/services/ant-design-pro/robotApi';
-import {useWatch} from "rc-field-form";
+import {courtyardLevelUp} from "@/services/ant-design-pro/robotApi";
 
 interface ModalNodeProps<T> {
   closeModal: () => void;
@@ -27,7 +27,7 @@ const lvList = [
     label: 'Lv3',
   },
   {
-    value: '4',
+    value: '34',
     label: 'Lv4',
   },
   {
@@ -36,7 +36,7 @@ const lvList = [
   }
 ]
 
-export function useUpgradeFrogModal<T = any>(callback?: () => void) {
+export function useUpgradeCourtyardModal<T = any>(callback?: () => void) {
 
   const {open, openModal, closeModal, data} = useModalController<T>();
 
@@ -54,7 +54,7 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
 
   async function confirm() {
     const fieldsValues = await form.validateFields();
-    const createResult = await robotApi.frogLevelUp({
+    const createResult = await robotApi.courtyardLevelUp({
       targetLevel: fieldsValues.level,
       robotId: data.id,
     });
@@ -69,7 +69,7 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
 
   return (
     <Drawer
-      title={'升级青蛙'}
+      title={'升级庭院'}
       width={500}
       open={open}
       onClose={closeModal}
@@ -88,7 +88,7 @@ function ModalNode<T = any>(props: ModalNodeProps<T>) {
       >
         <ProFormSelect
           showSearch
-          label={'将青蛙升级到'}
+          label={'将庭院升级到'}
           rules={[
             {
               required: true,

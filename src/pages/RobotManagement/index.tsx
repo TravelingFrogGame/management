@@ -11,6 +11,7 @@ import {useUpgradeFrogModal} from "@/pages/RobotManagement/components/UpgradeFro
 import {useTravelModal} from "@/pages/RobotManagement/components/TravelModal";
 import {useProductModal} from "@/pages/RobotManagement/components/ProductModal";
 import {useFirstPurchaseModal} from "@/pages/RobotManagement/components/FirstPurchaseModal";
+import {useUpgradeCourtyardModal} from "@/pages/RobotManagement/components/UpgradeCourtyardModal";
 
 const RobotManagement: React.FC = () => {
   const MarketProxy = useFuncListDataProxy<RobotType>(robotApi.list, {execution: true});
@@ -21,6 +22,7 @@ const RobotManagement: React.FC = () => {
 
   const CreateRobotModal = useCreateRobotModal<RobotType>(refresh);
   const UpgradeFrogModal = useUpgradeFrogModal<RobotType>(refresh);
+  const UpgradeCourtyardModal = useUpgradeCourtyardModal<RobotType>(refresh);
   const TravelModal = useTravelModal<RobotType>(refresh);
   const ProductModal = useProductModal<RobotType>(refresh);
   const FirstPurchaseModal = useFirstPurchaseModal<RobotType>(refresh);
@@ -31,6 +33,9 @@ const RobotManagement: React.FC = () => {
 
   function upgradeFrog(item: RobotType) {
     UpgradeFrogModal.openModal(item);
+  }
+  function upgradeCourtyard(item: RobotType) {
+    UpgradeCourtyardModal.openModal(item);
   }
   function travel() {
     TravelModal.openModal();
@@ -98,28 +103,28 @@ const RobotManagement: React.FC = () => {
       search: false,
       dataIndex: "creatorName",
     },
-    // {
-    //   title: '操作',
-    //   search: false,
-    //   dataIndex: "op",
-    //   render(_, item) {
-    //     return (
-    //       <Flex>
-    //         <Button type="primary" key="primary" size={'small'} onClick={() => {
-    //           upgradeFrog(item);
-    //         }}>
-    //           升级青蛙
-    //         </Button>
-    //         <Button key="primary" size={'small'} onClick={() => {
-    //           CreateRobotModal.openModal();
-    //         }}>
-    //           升级庭院
-    //         </Button>
-    //       </Flex>
-    //
-    //     )
-    //   }
-    // }
+    {
+      title: '操作',
+      search: false,
+      dataIndex: "op",
+      render(_, item) {
+        return (
+          <Flex>
+            <Button type="primary" key="primary" size={'small'} onClick={() => {
+              upgradeFrog(item);
+            }}>
+              升级青蛙
+            </Button>
+            <Button key="primary" size={'small'} onClick={() => {
+              upgradeCourtyard(item);
+            }}>
+              升级庭院
+            </Button>
+          </Flex>
+
+        )
+      }
+    }
   ];
 
 
@@ -130,6 +135,7 @@ const RobotManagement: React.FC = () => {
       {TravelModal.node}
       {ProductModal.node}
       {FirstPurchaseModal.node}
+      {UpgradeCourtyardModal.node}
       <ProTable<InviteType, API.PageParams>
         search={false}
         options={{
@@ -140,9 +146,9 @@ const RobotManagement: React.FC = () => {
         rowKey="key"
         columns={columns}
         toolBarRender={() => [
-          // <Button type="primary" key="primary" onClick={firstPurchase}>
-          //   首发购买
-          // </Button>,
+          <Button type="primary" key="primary" onClick={firstPurchase}>
+            首发购买
+          </Button>,
           <Button type="primary" key="primary" onClick={product}>
             去生产
           </Button>,

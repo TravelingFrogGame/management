@@ -88,6 +88,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
       assetId: asset?.assetId,
       assetConfigId: asset?.assetConfigId!,
       probability: fieldsValues.probability,
+      amount: fieldsValues.amount
     }
     const apiResult = await lotteryApi.add(parameterData);
     if (apiResult.error) {
@@ -105,6 +106,7 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
     const parameterData = {
       id: initData.id,
       probability: fieldsValues.probability,
+      amount: fieldsValues.amount
     }
 
 
@@ -141,7 +143,8 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
         initialValues={
           initData && {
             assetId: initData.id,
-            probability: initData.probability.split("/")[0]
+            probability: initData.probability.split("/")[0],
+            amount: initData.amount
           }
         }
       >
@@ -169,6 +172,17 @@ function ModalNode<T>(props: ModalNodeProps<T>) {
           ]}
           name="probability"
           placeholder={'请输入中将概率'}
+        />
+        <ProFormText
+          label={'数量'}
+          rules={[
+            {
+              required: true,
+              message: '数量不能为空',
+            },
+          ]}
+          name="amount"
+          placeholder={'数量'}
         />
       </Form>
     </Drawer>

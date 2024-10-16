@@ -7,6 +7,7 @@ export interface LotteryType {
   name: string;
   probability: string;
   type: string;
+  amount: number;
 }
 
 export async function list(

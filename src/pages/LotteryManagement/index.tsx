@@ -50,6 +50,11 @@ const Invite: React.FC = () => {
       search: false,
     },
     {
+      title: '数量',
+      dataIndex: 'amount',
+      search: false,
+    },
+    {
       title: '操作',
       search: false,
       render(d_, item) {
